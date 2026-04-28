@@ -1,4 +1,4 @@
-# Proyecto FuzFuz Calculadora · Plan completo
+# PackPrice · Plan completo (calculadora de packs)
 
 > Documento de referencia con todas las decisiones, parámetros, fórmulas, riesgos y arquitectura del proyecto. Generado al cierre de la sesión de diseño y entrega de V1 web + V2 Electron.
 
@@ -6,9 +6,9 @@
 
 ## 1. Contexto y objetivo
 
-**Cliente / proyecto**: FuzFuz, marca propia de personalización textil DTF en Guadalajara (España). Más de 10 años en el sector.
+**Cliente / proyecto**: empresa de personalización textil DTF en Guadalajara (España), más de 10 años en el sector. La calculadora interna se llama **PackPrice**.
 
-**Objetivo del proyecto**: dotar a FuzFuz de una calculadora interna para presupuestar rápidamente "packs de peña" (encargos típicos de grupos de amigos en verano) con varias modalidades, manteniendo márgenes sanos y permitiendo comunicar precios públicos consistentes con descuento por volumen.
+**Objetivo del proyecto**: dotar al taller de una calculadora interna para presupuestar rápidamente "packs de peña" (encargos típicos de grupos de amigos en verano) con varias modalidades, manteniendo márgenes sanos y permitiendo comunicar precios públicos consistentes con descuento por volumen.
 
 **Posicionamiento comercial**: profesional, no low-cost. Argumentario apoyado en experiencia, garantía de reposición ante defectos y servicio cercano. El precio es un factor pero no el principal.
 
@@ -180,7 +180,7 @@ margen % = margen € / total_iva_inc
 
 **5.2. Rotura de stock en Roly**: cerrar stock antes de confirmar precio en pedidos >30 packs. Tener modelos alternativos identificados.
 
-**5.3. Derechos del diseño**: cláusula firmada en hoja de pedido. El cliente declara tener derechos. FuzFuz queda exonerado.
+**5.3. Derechos del diseño**: cláusula firmada en hoja de pedido. El cliente declara tener derechos. La empresa queda exonerada.
 
 **5.4. Merma real >10%**: medir en los primeros 3 pedidos grandes. Si supera 12% sistemáticamente, ajustar parámetro y subir PVP del tramo superior.
 
@@ -233,7 +233,7 @@ margen % = margen € / total_iva_inc
 ## 7. Estructura de la app V2
 
 ```
-fuzfuz_app_v2/
+packs app/
 ├── package.json              ← dependencias Electron + scripts build
 ├── main.js                   ← proceso principal: filesystem, IPC, ventana
 ├── preload.js                ← puente seguro main↔renderer
@@ -248,7 +248,7 @@ fuzfuz_app_v2/
 En cada PC, además, Electron crea automáticamente:
 
 ```
-%APPDATA%\fuzfuz-calculadora\
+%APPDATA%\packprice\
 └── settings.json             ← ruta del config + nombre del usuario
 ```
 
@@ -411,7 +411,7 @@ npm run dev              # ejecutar en modo desarrollo (sin construir .exe)
 npm run build:win        # generar .exe portable en dist/
 ```
 
-El `.exe` resultante: `dist/FuzFuz-Calculadora-2.0.0-portable.exe`.
+El `.exe` resultante: `dist/PackPrice-2.0.0-portable.exe`.
 
 ---
 

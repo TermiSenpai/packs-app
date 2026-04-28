@@ -1,19 +1,35 @@
-'use strict';
+// ============================================================
+// PackPrice · Renderer (orquestación)
+// ============================================================
+// - Bootstrap y enrutado entre pantallas
+// - Eventos del DOM
+// - Llamadas IPC al proceso principal vía window.packprice
+//
+// La lógica pura vive en:
+//   - calculo.js  (cálculo de packs)
+//   - admin.js    (renderizado del editor admin)
+//   - format.js   (utilidades de DOM/formato)
+// ============================================================
+
+import { el, show, hide, intDe, fmtEur, fmtPct, deepClone } from './format.js';
+import {
+  calcularPackPena,
+  calcularPackIndividual,
+  calcularPackMixto
+} from './calculo.js';
+import {
+  renderAdminTabContent,
+  actualizarConfigDesdeInput
+} from './admin.js';
 
 // ============================================================
-// FuzFuz Calculadora · Renderer
+// Estado del módulo
 // ============================================================
-// Comunicación con el filesystem vía window.fuzfuz (preload.js).
-// La lógica de cálculo es la misma de la V1 web.
-// ============================================================
-
-// ============================================================
-// Estado global
-// ============================================================
-let CFG = null;                    // configuración actual
+let CFG = null;                    // configuración actual cargada del NAS
 let SETTINGS = null;                // ruta_config + nombre_usuario
-let infoConfigAlAbrirAdmin = null;  // mtime + hash al entrar en modo admin (para detectar conflictos)
+let infoConfigAlAbrirAdmin = null;  // mtime + hash al abrir admin (conflictos)
 let CFG_BACKUP = null;              // copia para "Cancelar cambios"
+let eventosBindeados = false;
 
 const estado = {
   packId: null,
@@ -22,185 +38,11 @@ const estado = {
 };
 
 // ============================================================
-// Utilidades
-// ============================================================
-
-function el(id) { return document.getElementById(id); }
-function show(id) { el(id).classList.remove('hidden'); }
-function hide(id) { el(id).classList.add('hidden'); }
-
-function fmtEur(num) {
-  if (num === null || num === undefined || isNaN(num)) return '-';
-  return num.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-}
-function fmtPct(num) {
-  if (num === null || num === undefined || isNaN(num)) return '-';
-  return (num * 100).toFixed(1) + ' %';
-}
-function intDe(id) { return parseInt(el(id).value, 10) || 0; }
-
-function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
-
-// ============================================================
-// Lógica de cálculo (misma que V1)
-// ============================================================
-
-function getTramo(cantidad) {
-  for (const t of CFG.tramos) {
-    const cumpleMin = cantidad >= t.desde;
-    const cumpleMax = (t.hasta === null) || (cantidad <= t.hasta);
-    if (cumpleMin && cumpleMax) return t;
-  }
-  return null;
-}
-
-function calcularCostePrenda(modeloId, caras, tramo, totalPrendasParaEnvio) {
-  const m = CFG.modelos_roly[modeloId];
-  const p = CFG.parametros;
-
-  const baseRoly = m.precio;
-  const dtfMetros = (caras === 2) ? p.dtf_metros_2caras : p.dtf_metros_1cara;
-  const dtf = dtfMetros * p.dtf_eur_metro;
-  const planchado = caras * p.planchado_eur_cara;
-
-  const numBultos = Math.ceil(totalPrendasParaEnvio / p.prendas_por_bulto);
-  const envioPorPrenda = (numBultos * p.envio_roly_eur_bulto) / totalPrendasParaEnvio;
-
-  const subtotalPreMerma = baseRoly + envioPorPrenda + dtf + planchado;
-  const merma = subtotalPreMerma * p.merma_pct;
-
-  const minutosBase = (caras === 2) ? p.minutos_2caras_base : p.minutos_1cara_base;
-  const minutosReal = minutosBase * (1 - tramo.reduccion_tiempo);
-  const mo = (minutosReal / 60) * p.mo_eur_hora;
-
-  const indirectos = p.indirectos_eur_prenda;
-
-  return {
-    total: baseRoly + envioPorPrenda + dtf + planchado + merma + mo + indirectos
-  };
-}
-
-function calcularPackPena(opt) {
-  const { cantidad, capucha, caras, cant_4xl, cant_5xl } = opt;
-  const pack = CFG.packs.pena_completa;
-
-  if (cantidad < pack.min) {
-    return { error: `Mínimo ${pack.min} packs para "${pack.nombre}".` };
-  }
-
-  const tramo = getTramo(cantidad);
-  const carasKey = (caras === 2) ? 'dos_caras' : 'una_cara';
-  const capuchaKey = (capucha === 'con') ? 'con_capucha' : 'sin_capucha';
-  const pvpUnit = pack.pvp[capuchaKey][carasKey][tramo.id];
-
-  const totalPrendas = cantidad * 2;
-  const sudaderaModelo = (capucha === 'con') ? 'URBAN' : 'CLASICA';
-  const costeCamiseta = calcularCostePrenda('BEAGLE', caras, tramo, totalPrendas);
-  const costeSudadera = calcularCostePrenda(sudaderaModelo, caras, tramo, totalPrendas);
-  const buffer3xl = CFG.parametros.buffer_3xl_eur_pack;
-  const costePack = costeCamiseta.total + costeSudadera.total + buffer3xl;
-
-  return calcularTotales({
-    pack: pack.nombre, tramo: tramo.etiqueta, cantidad,
-    pvp_unitario: pvpUnit, coste_unitario: costePack,
-    cant_4xl, cant_5xl,
-    detalle_extra: { capucha: capuchaKey, caras }
-  });
-}
-
-function calcularPackIndividual(packId, opt) {
-  const { cantidad, caras, cant_4xl, cant_5xl } = opt;
-  const pack = CFG.packs[packId];
-
-  if (cantidad < pack.min) {
-    return { error: `Mínimo ${pack.min} unidades para "${pack.nombre}".` };
-  }
-
-  const tramo = getTramo(cantidad);
-  const carasKey = (caras === 2) ? 'dos_caras' : 'una_cara';
-  const pvpUnit = pack.pvp[carasKey][tramo.id];
-
-  const costeUnit = calcularCostePrenda(pack.modelo, caras, tramo, cantidad);
-
-  return calcularTotales({
-    pack: pack.nombre, tramo: tramo.etiqueta, cantidad,
-    pvp_unitario: pvpUnit, coste_unitario: costeUnit.total,
-    cant_4xl, cant_5xl,
-    detalle_extra: { modelo: pack.modelo, caras }
-  });
-}
-
-function calcularPackMixto(opt) {
-  const { cant_clasica, cant_urban, caras, cant_4xl, cant_5xl } = opt;
-  const pack = CFG.packs.sudaderas_mixto;
-  const total = cant_clasica + cant_urban;
-
-  if (total < pack.min_total) {
-    return { error: `Mínimo ${pack.min_total} sudaderas en total.` };
-  }
-  if (cant_clasica === 0 && cant_urban === 0) {
-    return { error: 'Indica al menos una cantidad mayor que cero.' };
-  }
-
-  const tramo = getTramo(total);
-  const carasKey = (caras === 2) ? 'dos_caras' : 'una_cara';
-
-  const pvpClasica = CFG.packs[pack.packs_referencia.CLASICA].pvp[carasKey][tramo.id];
-  const pvpUrban   = CFG.packs[pack.packs_referencia.URBAN].pvp[carasKey][tramo.id];
-
-  const subtotal = (cant_clasica * pvpClasica) + (cant_urban * pvpUrban);
-  const recargos = (cant_4xl * CFG.parametros.recargo_4xl_eur)
-                 + (cant_5xl * CFG.parametros.recargo_5xl_eur);
-  const totalIvaInc = subtotal + recargos;
-
-  const costeClasica = calcularCostePrenda('CLASICA', caras, tramo, total);
-  const costeUrban   = calcularCostePrenda('URBAN', caras, tramo, total);
-  const costeTotal = (cant_clasica * costeClasica.total) + (cant_urban * costeUrban.total);
-
-  const baseVenta = totalIvaInc / (1 + CFG.parametros.iva);
-  const iva = totalIvaInc - baseVenta;
-  const margen = baseVenta - costeTotal;
-  const margenPct = totalIvaInc > 0 ? (margen / totalIvaInc) : 0;
-
-  return {
-    pack: pack.nombre, tramo: tramo.etiqueta, es_mixto: true,
-    cantidad_total: total, cant_4xl, cant_5xl, caras,
-    desglose: [
-      { modelo: 'CLASICA', nombre: CFG.modelos_roly.CLASICA.nombre, cantidad: cant_clasica, pvp: pvpClasica, subtotal: cant_clasica * pvpClasica },
-      { modelo: 'URBAN',   nombre: CFG.modelos_roly.URBAN.nombre,   cantidad: cant_urban,   pvp: pvpUrban,   subtotal: cant_urban * pvpUrban }
-    ],
-    subtotal, recargos, total_iva_inc: totalIvaInc, base_venta: baseVenta, iva,
-    coste_total: costeTotal, margen, margen_pct: margenPct
-  };
-}
-
-function calcularTotales(datos) {
-  const subtotal = datos.cantidad * datos.pvp_unitario;
-  const recargos = (datos.cant_4xl * CFG.parametros.recargo_4xl_eur)
-                 + (datos.cant_5xl * CFG.parametros.recargo_5xl_eur);
-  const totalIvaInc = subtotal + recargos;
-  const baseVenta = totalIvaInc / (1 + CFG.parametros.iva);
-  const iva = totalIvaInc - baseVenta;
-  const costeTotal = datos.cantidad * datos.coste_unitario;
-  const margen = baseVenta - costeTotal;
-  const margenPct = totalIvaInc > 0 ? (margen / totalIvaInc) : 0;
-
-  return {
-    pack: datos.pack, tramo: datos.tramo, cantidad: datos.cantidad,
-    pvp_unitario: datos.pvp_unitario, cant_4xl: datos.cant_4xl, cant_5xl: datos.cant_5xl,
-    subtotal, recargos, total_iva_inc: totalIvaInc, base_venta: baseVenta, iva,
-    coste_unitario: datos.coste_unitario, coste_total: costeTotal,
-    margen, margen_pct: margenPct,
-    extra: datos.detalle_extra
-  };
-}
-
-// ============================================================
 // Arranque: decidir pantalla a mostrar
 // ============================================================
 
 async function arrancar() {
-  SETTINGS = await window.fuzfuz.leerSettings();
+  SETTINGS = await window.packprice.leerSettings();
 
   if (!SETTINGS || !SETTINGS.ruta_config || !SETTINGS.nombre_usuario) {
     mostrarBienvenida();
@@ -215,11 +57,11 @@ function mostrarBienvenida() {
   hide('pantalla-error');
   show('pantalla-bienvenida');
 
-  // Sugerencia de ruta por defecto
-  el('bv-ruta').value = 'Z:\\Packs\\config.js';
-
+  // 1) Enganchar listeners INMEDIATAMENTE para que la pantalla sea
+  //    interactiva sin esperar a ningún IPC. La sugerencia de ruta
+  //    se rellena en background (best-effort) sin bloquear.
   el('btn-bv-explorar').addEventListener('click', async () => {
-    const r = await window.fuzfuz.seleccionarConfig();
+    const r = await window.packprice.seleccionarConfig();
     if (!r.cancelado) {
       el('bv-ruta').value = r.ruta;
       validarFormBienvenida();
@@ -228,8 +70,22 @@ function mostrarBienvenida() {
 
   el('bv-nombre').addEventListener('input', validarFormBienvenida);
   el('bv-ruta').addEventListener('input', validarFormBienvenida);
-
   el('btn-bv-empezar').addEventListener('click', empezarPrimeraVez);
+
+  validarFormBienvenida();
+  setTimeout(() => el('bv-nombre').focus(), 50);
+
+  // 2) Sugerencia de ruta en background. Si el usuario ya está
+  //    escribiendo cuando llega, no la pisamos.
+  window.packprice.rutaConfigPorDefecto()
+    .then((sugerencia) => {
+      const input = el('bv-ruta');
+      if (!input.value && sugerencia && sugerencia.sugerida) {
+        input.value = sugerencia.sugerida;
+        validarFormBienvenida();
+      }
+    })
+    .catch(() => { /* no bloqueamos la UI por una sugerencia */ });
 }
 
 function validarFormBienvenida() {
@@ -241,31 +97,77 @@ function validarFormBienvenida() {
 async function empezarPrimeraVez() {
   const nombre = el('bv-nombre').value.trim();
   const ruta = el('bv-ruta').value.trim();
+  hide('bv-error');
 
-  // Validar que el archivo se puede leer antes de guardar settings
-  const r = await window.fuzfuz.leerConfig(ruta);
-  if (!r.ok) {
-    el('bv-error').textContent = `No se pudo leer el archivo: ${r.error}`;
-    show('bv-error');
-    return;
+  // Bloquear el botón mientras comprobamos. La verificación toca el
+  // filesystem y, sobre rutas UNC inaccesibles, puede tardar.
+  const btn = el('btn-bv-empezar');
+  const textoOriginal = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Comprobando ruta...';
+  try {
+    await empezarPrimeraVezImpl(nombre, ruta);
+  } finally {
+    btn.textContent = textoOriginal;
+    validarFormBienvenida();
+  }
+}
+
+async function empezarPrimeraVezImpl(nombre, ruta) {
+  // 1) Si el archivo no existe, ofrecer crearlo con defaults del plan.
+  const exist = await window.packprice.existeConfig(ruta);
+  if (!exist.existe) {
+    if (!exist.escribible) {
+      mostrarErrorBienvenida(
+        'No se puede crear el archivo en esa ruta. Comprueba que el NAS está accesible y tienes permisos de escritura.'
+      );
+      return;
+    }
+    const opcion = await window.packprice.confirmar({
+      titulo: 'Archivo no encontrado',
+      mensaje: '¿Crear config.js con los valores por defecto?',
+      detalle: `No se encontró un archivo de configuración en:\n${ruta}\n\nSe creará uno nuevo con los valores por defecto del plan.`,
+      botones: ['Crear con valores por defecto', 'Cancelar'],
+      defaultId: 0
+    });
+    if (opcion !== 0) return;
+
+    const creado = await window.packprice.crearConfigDefault({ ruta, modificadoPor: nombre });
+    if (!creado.ok) {
+      mostrarErrorBienvenida(`No se pudo crear el archivo: ${creado.error}`);
+      return;
+    }
+  } else {
+    // Si existe, validamos que se puede leer.
+    const r = await window.packprice.leerConfig(ruta);
+    if (!r.ok) {
+      mostrarErrorBienvenida(`No se pudo leer el archivo: ${r.error}`);
+      return;
+    }
   }
 
+  // 2) Persistir settings locales.
   SETTINGS = { ruta_config: ruta, nombre_usuario: nombre };
-  const guardado = await window.fuzfuz.guardarSettings(SETTINGS);
+  const guardado = await window.packprice.guardarSettings(SETTINGS);
   if (!guardado.ok) {
-    el('bv-error').textContent = `No se pudo guardar la configuración local: ${guardado.error}`;
-    show('bv-error');
+    mostrarErrorBienvenida(`No se pudo guardar la configuración local: ${guardado.error}`);
     return;
   }
 
+  // 3) Arrancar app.
   hide('pantalla-bienvenida');
   await cargarConfigYMostrarApp();
 }
 
+function mostrarErrorBienvenida(mensaje) {
+  el('bv-error').textContent = mensaje;
+  show('bv-error');
+}
+
 async function cargarConfigYMostrarApp() {
-  const r = await window.fuzfuz.leerConfig(SETTINGS.ruta_config);
+  const r = await window.packprice.leerConfig(SETTINGS.ruta_config);
   if (!r.ok) {
-    mostrarPantallaError(r.error);
+    await mostrarPantallaError(r.error);
     return;
   }
 
@@ -276,20 +178,56 @@ async function cargarConfigYMostrarApp() {
   inicializarApp();
 }
 
-function mostrarPantallaError(detalle) {
+async function mostrarPantallaError(detalle) {
   hide('pantalla-app');
   hide('pantalla-bienvenida');
   show('pantalla-error');
   el('error-detalle').textContent = detalle;
 
+  // El botón "Crear config con defaults" solo tiene sentido si el archivo
+  // no existe pero la ruta es escribible.
+  const exist = await window.packprice.existeConfig(SETTINGS.ruta_config);
+  const btnCrear = el('btn-error-crear-default');
+  if (btnCrear) {
+    if (!exist.existe && exist.escribible) {
+      btnCrear.classList.remove('hidden');
+    } else {
+      btnCrear.classList.add('hidden');
+    }
+    btnCrear.onclick = async () => {
+      const opcion = await window.packprice.confirmar({
+        titulo: 'Crear config por defecto',
+        mensaje: '¿Crear config.js con los valores por defecto?',
+        detalle: `Ruta: ${SETTINGS.ruta_config}`,
+        botones: ['Crear', 'Cancelar'],
+        defaultId: 0
+      });
+      if (opcion !== 0) return;
+
+      const creado = await window.packprice.crearConfigDefault({
+        ruta: SETTINGS.ruta_config,
+        modificadoPor: SETTINGS.nombre_usuario
+      });
+      if (!creado.ok) {
+        await window.packprice.mostrarError({
+          titulo: 'Error',
+          mensaje: 'No se pudo crear el archivo',
+          detalle: creado.error
+        });
+        return;
+      }
+      await cargarConfigYMostrarApp();
+    };
+  }
+
   el('btn-error-reintentar').onclick = async () => {
     await cargarConfigYMostrarApp();
   };
   el('btn-error-cambiar-ruta').onclick = async () => {
-    const r = await window.fuzfuz.seleccionarConfig();
+    const r = await window.packprice.seleccionarConfig();
     if (!r.cancelado) {
       SETTINGS.ruta_config = r.ruta;
-      await window.fuzfuz.guardarSettings(SETTINGS);
+      await window.packprice.guardarSettings(SETTINGS);
       await cargarConfigYMostrarApp();
     }
   };
@@ -314,13 +252,11 @@ function inicializarApp() {
     }
   });
 
-  // Render lista de packs
   renderListaPacks();
 
-  // Eventos (sólo una vez)
-  if (!inicializarApp._inicializado) {
+  if (!eventosBindeados) {
     bindearEventos();
-    inicializarApp._inicializado = true;
+    eventosBindeados = true;
   }
 }
 
@@ -342,7 +278,7 @@ function bindearEventos() {
   el('btn-cancelar-admin').addEventListener('click', cancelarCambiosAdmin);
 
   document.querySelectorAll('.admin-tab').forEach(tab => {
-    tab.addEventListener('click', () => renderAdminTab(tab.dataset.tab));
+    tab.addEventListener('click', () => mostrarAdminTab(tab.dataset.tab));
   });
 
   el('admin-overlay').addEventListener('click', (e) => {
@@ -354,7 +290,7 @@ function bindearEventos() {
   el('btn-aj-cancelar').addEventListener('click', cerrarAjustes);
   el('btn-aj-guardar').addEventListener('click', guardarAjustes);
   el('btn-aj-explorar').addEventListener('click', async () => {
-    const r = await window.fuzfuz.seleccionarConfig();
+    const r = await window.packprice.seleccionarConfig();
     if (!r.cancelado) {
       el('aj-ruta').value = r.ruta;
     }
@@ -367,8 +303,41 @@ function bindearEventos() {
     if (e.key === 'Escape') {
       cerrarAdmin();
       cerrarAjustes();
+      return;
+    }
+
+    // Enter (teclado normal y numpad ambos llegan como 'Enter') dispara
+    // "Calcular" cuando estás rellenando el pedido. No actúa si hay un
+    // modal abierto ni si la sección de inputs no se está mostrando.
+    if (e.key === 'Enter') {
+      const paso2 = el('seccion-paso2');
+      if (paso2.classList.contains('hidden')) return;
+      if (!el('admin-overlay').classList.contains('hidden')) return;
+      if (!el('ajustes-overlay').classList.contains('hidden')) return;
+      if (!(e.target instanceof HTMLElement) || !paso2.contains(e.target)) return;
+
+      e.preventDefault();
+      ejecutarCalculo();
     }
   });
+
+  // UX inputs numéricos: al enfocar, seleccionar todo el valor para
+  // que el usuario sobrescriba directamente sin tener que borrar primero.
+  // Delegado en document porque los inputs se generan dinámicamente.
+  document.addEventListener('focusin', (e) => {
+    if (e.target instanceof HTMLInputElement && e.target.type === 'number') {
+      e.target.select();
+    }
+  });
+
+  // Evitar que la rueda del ratón cambie el valor de un input numérico
+  // por accidente al hacer scroll en la página.
+  document.addEventListener('wheel', (e) => {
+    const a = document.activeElement;
+    if (a instanceof HTMLInputElement && a.type === 'number' && a === e.target) {
+      a.blur();
+    }
+  }, { passive: true });
 }
 
 // ============================================================
@@ -502,9 +471,9 @@ function ejecutarCalculo() {
   const opt = recogerInputs();
 
   let resultado;
-  if (pack.tipo === 'pena') resultado = calcularPackPena(opt);
-  else if (pack.tipo === 'individual') resultado = calcularPackIndividual(estado.packId, opt);
-  else if (pack.tipo === 'mixto') resultado = calcularPackMixto(opt);
+  if (pack.tipo === 'pena')            resultado = calcularPackPena(CFG, opt);
+  else if (pack.tipo === 'individual') resultado = calcularPackIndividual(CFG, estado.packId, opt);
+  else if (pack.tipo === 'mixto')      resultado = calcularPackMixto(CFG, opt);
 
   if (resultado.error) {
     el('error-msg').textContent = resultado.error;
@@ -520,7 +489,8 @@ function ejecutarCalculo() {
 
 function renderResultado(r) {
   const c = el('resultado-content');
-  let metaHtml = '', tablaHtml = '';
+  let metaHtml = '';
+  let tablaHtml = '';
 
   if (r.es_mixto) {
     metaHtml = `
@@ -693,144 +663,28 @@ async function mostrarEditorAdmin() {
   hide('admin-login');
   show('admin-editor');
 
-  // Tomar snapshot del archivo y de la config para detectar conflictos
+  // Snapshot del archivo y de la config para detectar conflictos
   CFG_BACKUP = deepClone(CFG);
-  infoConfigAlAbrirAdmin = await window.fuzfuz.infoConfig(SETTINGS.ruta_config);
+  infoConfigAlAbrirAdmin = await window.packprice.infoConfig(SETTINGS.ruta_config);
 
-  renderAdminTab(estado.adminTab);
+  mostrarAdminTab(estado.adminTab);
 }
 
-function renderAdminTab(tab) {
+function mostrarAdminTab(tab) {
   estado.adminTab = tab;
   document.querySelectorAll('.admin-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.tab === tab);
   });
 
   const cont = el('admin-tab-content');
-  if (tab === 'parametros') cont.innerHTML = renderAdminParametros();
-  else if (tab === 'modelos') cont.innerHTML = renderAdminModelos();
-  else if (tab === 'tramos')  cont.innerHTML = renderAdminTramos();
-  else if (tab === 'packs')   cont.innerHTML = renderAdminPacks();
+  cont.innerHTML = renderAdminTabContent(CFG, tab);
 
   cont.querySelectorAll('input[data-cfg-path]').forEach(input => {
-    input.addEventListener('change', () => actualizarConfigDesdeInput(input));
+    input.addEventListener('change', () => actualizarConfigDesdeInput(CFG, input));
   });
 }
-
-function renderAdminParametros() {
-  const labels = {
-    mo_eur_hora: 'Mano de obra (€/h por persona)',
-    iva: 'IVA (decimal, ej. 0.21)',
-    merma_pct: 'Merma (decimal, ej. 0.10)',
-    indirectos_eur_prenda: 'Indirectos (€/prenda)',
-    buffer_3xl_eur_pack: 'Buffer 3XL (€/pack peña)',
-    recargo_4xl_eur: 'Recargo 4XL (€/prenda)',
-    recargo_5xl_eur: 'Recargo 5XL+ (€/prenda)',
-    envio_roly_eur_bulto: 'Envío Roly (€/bulto)',
-    prendas_por_bulto: 'Prendas por bulto',
-    dtf_eur_metro: 'DTF (€/metro)',
-    dtf_metros_2caras: 'DTF metros 2 caras',
-    dtf_metros_1cara: 'DTF metros 1 cara',
-    planchado_eur_cara: 'Planchado (€/cara)',
-    minutos_2caras_base: 'Minutos por prenda 2 caras',
-    minutos_1cara_base: 'Minutos por prenda 1 cara'
-  };
-
-  let html = '<div class="admin-grid">';
-  for (const [key, lbl] of Object.entries(labels)) {
-    html += `
-      <label>${lbl}</label>
-      <input type="number" step="0.01" value="${CFG.parametros[key]}" data-cfg-path="parametros.${key}">
-    `;
-  }
-  html += '</div>';
-  return html;
-}
-
-function renderAdminModelos() {
-  let html = '<div class="admin-grid">';
-  for (const [k, m] of Object.entries(CFG.modelos_roly)) {
-    html += `
-      <label>${m.nombre} <span class="hint">(${k} · ${m.ref})</span></label>
-      <input type="number" step="0.0001" value="${m.precio}" data-cfg-path="modelos_roly.${k}.precio">
-    `;
-  }
-  html += '</div>';
-  return html;
-}
-
-function renderAdminTramos() {
-  let html = '<p class="hint">Edita los rangos de cada tramo de volumen y la reducción de tiempo aplicable.</p>';
-  CFG.tramos.forEach((t, i) => {
-    html += `
-      <div class="admin-subhead">${t.id} · ${t.etiqueta}</div>
-      <div class="admin-grid">
-        <label>Desde (uds)</label>
-        <input type="number" value="${t.desde}" data-cfg-path="tramos.${i}.desde">
-        <label>Hasta (uds, vacío = sin límite)</label>
-        <input type="number" value="${t.hasta === null ? '' : t.hasta}" data-cfg-path="tramos.${i}.hasta">
-        <label>Reducción de tiempo (decimal)</label>
-        <input type="number" step="0.01" value="${t.reduccion_tiempo}" data-cfg-path="tramos.${i}.reduccion_tiempo">
-      </div>
-    `;
-  });
-  return html;
-}
-
-function renderAdminPacks() {
-  let html = '<p class="hint">PVP por tramo (IVA incluido). El pack mixto sudaderas usa los precios de "solo_clasica" y "solo_urban" automáticamente.</p>';
-
-  for (const [id, pack] of Object.entries(CFG.packs)) {
-    if (pack.tipo === 'mixto') continue;
-
-    html += `<div class="admin-subhead">${pack.nombre}</div>`;
-
-    if (pack.tipo === 'pena') {
-      for (const cap of ['sin_capucha', 'con_capucha']) {
-        for (const car of ['dos_caras', 'una_cara']) {
-          html += `<div class="admin-mini-head">${cap === 'con_capucha' ? 'Con capucha' : 'Sin capucha'} · ${car === 'dos_caras' ? '2 caras' : '1 cara'}</div>`;
-          html += '<div class="admin-grid">';
-          for (const t of CFG.tramos) {
-            html += `
-              <label>${t.etiqueta}</label>
-              <input type="number" step="0.01" value="${pack.pvp[cap][car][t.id]}" data-cfg-path="packs.${id}.pvp.${cap}.${car}.${t.id}">
-            `;
-          }
-          html += '</div>';
-        }
-      }
-    } else if (pack.tipo === 'individual') {
-      for (const car of ['dos_caras', 'una_cara']) {
-        html += `<div class="admin-mini-head">${car === 'dos_caras' ? '2 caras' : '1 cara'}</div>`;
-        html += '<div class="admin-grid">';
-        for (const t of CFG.tramos) {
-          html += `
-            <label>${t.etiqueta}</label>
-            <input type="number" step="0.01" value="${pack.pvp[car][t.id]}" data-cfg-path="packs.${id}.pvp.${car}.${t.id}">
-          `;
-        }
-        html += '</div>';
-      }
-    }
-  }
-  return html;
-}
-
-function actualizarConfigDesdeInput(input) {
-  const path = input.dataset.cfgPath.split('.');
-  const valor = input.value === '' ? null : parseFloat(input.value);
-
-  let obj = CFG;
-  for (let i = 0; i < path.length - 1; i++) obj = obj[path[i]];
-  obj[path[path.length - 1]] = valor;
-}
-
-// ============================================================
-// Guardar config en NAS con detección de conflictos
-// ============================================================
 
 async function guardarConfigEnNAS() {
-  // Actualizar metadatos de modificación
   CFG.fecha_actualizacion = new Date().toLocaleString('es-ES');
   CFG.modificado_por = SETTINGS.nombre_usuario;
 
@@ -840,71 +694,73 @@ async function guardarConfigEnNAS() {
     infoEsperada: infoConfigAlAbrirAdmin
   };
 
-  const r = await window.fuzfuz.guardarConfig(datos);
+  const r = await window.packprice.guardarConfig(datos);
 
   if (r.ok) {
     infoConfigAlAbrirAdmin = r.info;
     CFG_BACKUP = deepClone(CFG);
-    await window.fuzfuz.mostrarInfo({
+    await window.packprice.mostrarInfo({
       titulo: 'Guardado',
       mensaje: 'Cambios guardados correctamente en el NAS',
       detalle: r.backupPath ? `Backup creado en:\n${r.backupPath}` : ''
     });
-    inicializarApp();  // refrescar header con nueva fecha
+    inicializarApp();
     return;
   }
 
   if (r.conflicto) {
-    // Pedir decisión al usuario via diálogo nativo
-    const respuesta = await window.fuzfuz.confirmarConflicto({
-      modificadoPor: r.modificadoPor,
-      fechaActualizacion: r.fechaActualizacion
-    });
-
-    if (respuesta === 0) {
-      // Sobrescribir
-      const r2 = await window.fuzfuz.guardarConfigForzado({
-        ruta: SETTINGS.ruta_config,
-        configNuevo: CFG
-      });
-      if (r2.ok) {
-        infoConfigAlAbrirAdmin = r2.info;
-        CFG_BACKUP = deepClone(CFG);
-        await window.fuzfuz.mostrarInfo({
-          titulo: 'Guardado (forzado)',
-          mensaje: 'Cambios guardados sobrescribiendo la versión del compañero.'
-        });
-        inicializarApp();
-      } else {
-        await window.fuzfuz.mostrarError({
-          titulo: 'Error',
-          mensaje: 'No se pudo guardar',
-          detalle: r2.error
-        });
-      }
-    } else if (respuesta === 1) {
-      // Descartar mis cambios y recargar
-      cerrarAdmin();
-      estado.esAdmin = false;
-      el('btn-admin-toggle').textContent = '🔒 Admin';
-      await cargarConfigYMostrarApp();
-    }
-    // respuesta === 2: cancelar, no hacer nada
+    await resolverConflictoAdmin(r);
     return;
   }
 
-  // Error genérico
-  await window.fuzfuz.mostrarError({
+  await window.packprice.mostrarError({
     titulo: 'Error al guardar',
     mensaje: 'No se pudo guardar el archivo',
     detalle: r.error || 'Error desconocido'
   });
 }
 
+async function resolverConflictoAdmin(respuestaConflicto) {
+  const respuesta = await window.packprice.confirmarConflicto({
+    modificadoPor: respuestaConflicto.modificadoPor,
+    fechaActualizacion: respuestaConflicto.fechaActualizacion
+  });
+
+  if (respuesta === 0) {
+    // Sobrescribir
+    const r2 = await window.packprice.guardarConfigForzado({
+      ruta: SETTINGS.ruta_config,
+      configNuevo: CFG
+    });
+    if (r2.ok) {
+      infoConfigAlAbrirAdmin = r2.info;
+      CFG_BACKUP = deepClone(CFG);
+      await window.packprice.mostrarInfo({
+        titulo: 'Guardado (forzado)',
+        mensaje: 'Cambios guardados sobrescribiendo la versión del compañero.'
+      });
+      inicializarApp();
+    } else {
+      await window.packprice.mostrarError({
+        titulo: 'Error',
+        mensaje: 'No se pudo guardar',
+        detalle: r2.error
+      });
+    }
+  } else if (respuesta === 1) {
+    // Descartar mis cambios y recargar
+    cerrarAdmin();
+    estado.esAdmin = false;
+    el('btn-admin-toggle').textContent = '🔒 Admin';
+    await cargarConfigYMostrarApp();
+  }
+  // respuesta === 2: cancelar, no hacer nada
+}
+
 function cancelarCambiosAdmin() {
   if (CFG_BACKUP) {
     CFG = deepClone(CFG_BACKUP);
-    renderAdminTab(estado.adminTab);
+    mostrarAdminTab(estado.adminTab);
     inicializarApp();
   }
 }
@@ -928,18 +784,18 @@ async function guardarAjustes() {
   const ruta = el('aj-ruta').value.trim();
 
   if (!nombre || !ruta) {
-    await window.fuzfuz.mostrarError({
+    await window.packprice.mostrarError({
       titulo: 'Datos incompletos',
       mensaje: 'Indica nombre y ruta del config'
     });
     return;
   }
 
-  // Verificar que el archivo se puede leer si la ruta cambió
+  // Verificar que el archivo se puede leer si la ruta cambió.
   if (ruta !== SETTINGS.ruta_config) {
-    const r = await window.fuzfuz.leerConfig(ruta);
+    const r = await window.packprice.leerConfig(ruta);
     if (!r.ok) {
-      await window.fuzfuz.mostrarError({
+      await window.packprice.mostrarError({
         titulo: 'No se puede leer el archivo',
         mensaje: r.error
       });
@@ -948,13 +804,13 @@ async function guardarAjustes() {
   }
 
   SETTINGS = { nombre_usuario: nombre, ruta_config: ruta };
-  await window.fuzfuz.guardarSettings(SETTINGS);
+  await window.packprice.guardarSettings(SETTINGS);
   cerrarAjustes();
   await cargarConfigYMostrarApp();
 }
 
 // ============================================================
-// Arranque
+// Bootstrap
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', arrancar);

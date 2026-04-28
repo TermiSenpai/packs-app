@@ -1,5 +1,5 @@
 /* ============================================================
-   FuzFuz Calculadora - Estilos V1
+   PackPrice - Estilos
    Paleta: gris azulado neutro modo claro
    ============================================================ */
 
@@ -269,6 +269,20 @@ input[type="password"] {
   background: var(--bg-input);
   color: var(--text-primary);
   width: 100px;
+}
+
+/* Ocultar las flechas de spinner en inputs numéricos: a partir de
+   pedidos grandes (200+ uds) son más estorbo que ayuda. El usuario
+   escribe la cantidad a mano. */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 input[type="number"]:focus,

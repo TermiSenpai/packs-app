@@ -1,28 +1,31 @@
 {
-  "name": "fuzfuz-calculadora",
+  "name": "packprice",
   "version": "2.0.0",
-  "description": "Calculadora de packs FuzFuz - app de escritorio interna",
+  "description": "PackPrice - calculadora de packs (app de escritorio)",
   "main": "main.js",
-  "author": "FuzFuz",
+  "author": "PackPrice",
   "private": true,
   "scripts": {
+    "start": "electron .",
     "dev": "electron .",
     "build:win": "electron-builder --win --x64",
-    "build:win-portable": "electron-builder --win portable --x64"
+    "build:win-portable": "electron-builder --win portable --x64",
+    "clean": "node -e \"const fs=require('fs');for(const d of ['dist','out','build']){try{fs.rmSync(d,{recursive:true,force:true});}catch(e){}}\""
   },
   "devDependencies": {
     "electron": "^31.0.0",
     "electron-builder": "^24.13.0"
   },
   "build": {
-    "appId": "com.fuzfuz.calculadora",
-    "productName": "FuzFuz Calculadora",
+    "appId": "com.packprice.calculadora",
+    "productName": "PackPrice",
     "directories": {
       "output": "dist"
     },
     "files": [
       "main.js",
       "preload.js",
+      "config.default.js",
       "renderer/**/*",
       "icon.png",
       "package.json"
@@ -37,7 +40,7 @@
       "icon": "icon.png"
     },
     "portable": {
-      "artifactName": "FuzFuz-Calculadora-${version}-portable.exe"
+      "artifactName": "PackPrice-${version}-portable.exe"
     }
   }
 }

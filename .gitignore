@@ -1,0 +1,43 @@
+# Dependencias
+node_modules/
+
+# Build output
+dist/
+out/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Configuración local de Electron de pruebas (apunta a rutas reales)
+.cache/
+.electron-cache/
+
+# Archivos temporales o ZIPs antiguos
+*.zip
+!origin*.zip
+
+# Coverage / tests
+coverage/
+.nyc_output/
+
+# Variables de entorno locales
+.env
+.env.local
+
+# Configs reales con datos de negocio / claves admin (CLAUDE.md §11)
+CONFIG TEST/
+config.js
+!config.default.js

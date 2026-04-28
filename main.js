@@ -1,5 +1,5 @@
 // ============================================================
-// FuzFuz Calculadora - Proceso principal Electron
+// PackPrice - Proceso principal Electron
 // ============================================================
 // Responsabilidades:
 //   - Crear y gestionar la ventana
@@ -22,9 +22,23 @@ const path = require('path');
 const crypto = require('crypto');
 const vm = require('vm');
 
+const { buildDefaultConfig } = require('./config.default');
+
 // --- Configuración de paths ---
 const SETTINGS_DIR = path.join(app.getPath('userData'));
 const SETTINGS_PATH = path.join(SETTINGS_DIR, 'settings.json');
+
+// Ruta por defecto donde la app espera (y si hace falta crea) el config.js
+// compartido en el NAS. Se puede cambiar en "Ajustes" en cada PC y queda
+// persistido en el settings.json local.
+//
+// Se prueban en orden hasta encontrar una que sea escribible. La primera
+// existente o accesible se usa como ruta inicial; si ninguna existe se
+// crea en la primera viable.
+const RUTAS_CONFIG_CANDIDATAS = [
+  '\\\\172.26.0.154\\Paep\\Packs\\config.js',
+  'Z:\\Packs\\config.js'
+];
 
 let mainWindow = null;
 
@@ -49,10 +63,10 @@ function leerConfigDesdeArchivo(rutaArchivo) {
   } catch (err) {
     throw new Error(`Error al parsear config.js: ${err.message}`);
   }
-  if (!sandbox.window.FUZFUZ_CONFIG) {
-    throw new Error('El archivo no contiene window.FUZFUZ_CONFIG');
+  if (!sandbox.window.PACKPRICE_CONFIG) {
+    throw new Error('El archivo no contiene window.PACKPRICE_CONFIG');
   }
-  return sandbox.window.FUZFUZ_CONFIG;
+  return sandbox.window.PACKPRICE_CONFIG;
 }
 
 /**
@@ -61,7 +75,7 @@ function leerConfigDesdeArchivo(rutaArchivo) {
 function serializarConfig(config) {
   const json = JSON.stringify(config, null, 2);
   return `// ============================================================
-// FuzFuz - Configuración de la calculadora
+// PackPrice - Configuración de la calculadora
 // ============================================================
 // Editado: ${new Date().toLocaleString('es-ES')}
 // Modificado por: ${config.modificado_por || 'desconocido'}
@@ -71,7 +85,7 @@ function serializarConfig(config) {
 // el modo administrador.
 // ============================================================
 
-window.FUZFUZ_CONFIG = ${json};
+window.PACKPRICE_CONFIG = ${json};
 `;
 }
 
@@ -116,6 +130,69 @@ function crearBackup(rutaConfig) {
 }
 
 /**
+ * Comprueba si una ruta es escribible. Sin efectos secundarios:
+ * NO crea directorios, solo lee permisos del archivo o del padre.
+ *
+ * IMPORTANTE: esta función puede bloquear si la ruta apunta a un NAS
+ * inaccesible (Windows tarda en agotar el timeout SMB). Llamarla solo
+ * en respuesta a una acción explícita del usuario.
+ */
+function rutaEscribible(rutaArchivo) {
+  try {
+    if (fs.existsSync(rutaArchivo)) {
+      fs.accessSync(rutaArchivo, fs.constants.W_OK);
+      return true;
+    }
+    const dir = path.dirname(rutaArchivo);
+    if (fs.existsSync(dir)) {
+      fs.accessSync(dir, fs.constants.W_OK);
+      return true;
+    }
+    return false;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Devuelve una ruta candidata SIN probar el filesystem. Es solo una
+ * sugerencia para mostrar al usuario en la pantalla de bienvenida.
+ * La existencia y escribibilidad reales se verifican cuando el usuario
+ * pulsa "Empezar" (en `config:exists` y `config:create-default`).
+ *
+ * No hacemos `fs.existsSync` aquí porque sobre rutas UNC inaccesibles
+ * Windows puede tardar decenas de segundos, y eso bloquearía el
+ * arranque de la app.
+ */
+function sugerirRutaCandidata() {
+  return RUTAS_CONFIG_CANDIDATAS[0];
+}
+
+/**
+ * Crea el archivo config.js con valores por defecto en la ruta indicada.
+ * No sobrescribe si ya existe.
+ *
+ * @param {string} rutaArchivo
+ * @param {object} [meta] - { modificado_por }
+ * @returns {object} { creado: boolean, config, ruta, motivo? }
+ */
+function crearConfigPorDefecto(rutaArchivo, meta = {}) {
+  if (fs.existsSync(rutaArchivo)) {
+    return { creado: false, motivo: 'ya_existe', ruta: rutaArchivo };
+  }
+
+  const dir = path.dirname(rutaArchivo);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
+  const config = buildDefaultConfig(meta);
+  const contenido = serializarConfig(config);
+  fs.writeFileSync(rutaArchivo, contenido, 'utf-8');
+  return { creado: true, config, ruta: rutaArchivo };
+}
+
+/**
  * Carga settings locales de %APPDATA%.
  * Devuelve null si no existen (primer arranque).
  */
@@ -147,7 +224,7 @@ function crearVentana() {
     height: 800,
     minWidth: 720,
     minHeight: 600,
-    title: 'FuzFuz Calculadora',
+    title: 'PackPrice · Calculadora de packs',
     backgroundColor: '#E8ECF1',
     autoHideMenuBar: true,
     icon: path.join(__dirname, 'icon.png'),
@@ -207,9 +284,50 @@ ipcMain.handle('settings:write', (event, settings) => {
   }
 });
 
+// --- Ruta candidata por defecto (NAS) ---
+
+ipcMain.handle('config:default-path', () => {
+  // Devolución instantánea: sugerencia sin probar filesystem para no
+  // bloquear el arranque cuando el NAS está inaccesible.
+  return {
+    candidatas: RUTAS_CONFIG_CANDIDATAS.slice(),
+    sugerida:   sugerirRutaCandidata()
+  };
+});
+
+// --- Comprobación de existencia ---
+
+ipcMain.handle('config:exists', (event, ruta) => {
+  try {
+    return { existe: fs.existsSync(ruta), escribible: rutaEscribible(ruta) };
+  } catch (err) {
+    return { existe: false, escribible: false, error: err.message };
+  }
+});
+
+// --- Creación del config con defaults ---
+
+ipcMain.handle('config:create-default', (event, { ruta, modificadoPor }) => {
+  try {
+    const r = crearConfigPorDefecto(ruta, { modificado_por: modificadoPor });
+    if (!r.creado) {
+      return { ok: false, motivo: r.motivo, error: 'El archivo ya existe en esa ruta' };
+    }
+    const info = obtenerInfoArchivo(r.ruta);
+    return { ok: true, config: r.config, info, ruta: r.ruta };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+});
+
 // --- Diálogo de selección de archivo config ---
 
 ipcMain.handle('dialog:select-config', async () => {
+  // No pasamos `defaultPath` apuntando al NAS: si la ruta UNC está
+  // inaccesible, Windows se cuelga intentando resolverla antes de
+  // mostrar el diálogo. Usamos la carpeta del usuario como punto de
+  // partida (siempre instantánea); el explorador recuerda la última
+  // ubicación visitada en posteriores aperturas.
   const resultado = await dialog.showOpenDialog(mainWindow, {
     title: 'Selecciona el archivo de configuración',
     filters: [
@@ -217,7 +335,7 @@ ipcMain.handle('dialog:select-config', async () => {
       { name: 'Todos los archivos', extensions: ['*'] }
     ],
     properties: ['openFile'],
-    defaultPath: 'Z:\\Packs'  // sugerencia, el usuario puede navegar a otra parte
+    defaultPath: app.getPath('home')
   });
 
   if (resultado.canceled || resultado.filePaths.length === 0) {
@@ -335,6 +453,19 @@ ipcMain.handle('dialog:confirmar-conflicto', async (event, datos) => {
     cancelId: 2
   });
   return respuesta.response; // 0, 1 o 2
+});
+
+ipcMain.handle('dialog:confirmar', async (event, { titulo, mensaje, detalle, botones, defaultId }) => {
+  const respuesta = await dialog.showMessageBox(mainWindow, {
+    type: 'question',
+    title: titulo,
+    message: mensaje,
+    detail: detalle || '',
+    buttons: botones || ['Aceptar', 'Cancelar'],
+    defaultId: typeof defaultId === 'number' ? defaultId : 0,
+    cancelId: (botones || ['Aceptar', 'Cancelar']).length - 1
+  });
+  return respuesta.response;
 });
 
 ipcMain.handle('dialog:info', async (event, { titulo, mensaje, detalle }) => {

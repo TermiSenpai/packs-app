@@ -1,7 +1,7 @@
 // ============================================================
 // Preload - puente seguro entre el proceso main y el renderer
 // ============================================================
-// Expone APIs limitadas en window.fuzfuz vía contextBridge.
+// Expone APIs limitadas en window.packprice vía contextBridge.
 // El renderer NO tiene acceso directo a Node, fs, ipcRenderer,
 // ni nada similar. Solo puede llamar a las funciones aquí
 // expuestas, que internamente usan IPC para hablar con main.
@@ -11,7 +11,7 @@
 
 const { contextBridge, ipcRenderer } = require('electron');
 
-contextBridge.exposeInMainWorld('fuzfuz', {
+contextBridge.exposeInMainWorld('packprice', {
 
   // --- Settings locales (%APPDATA%) ---
   leerSettings:    ()        => ipcRenderer.invoke('settings:read'),
@@ -19,6 +19,13 @@ contextBridge.exposeInMainWorld('fuzfuz', {
 
   // --- Selección de archivo via diálogo nativo ---
   seleccionarConfig: ()      => ipcRenderer.invoke('dialog:select-config'),
+
+  // --- Ruta candidata por defecto (NAS) ---
+  rutaConfigPorDefecto: ()   => ipcRenderer.invoke('config:default-path'),
+
+  // --- Comprobación / creación del config ---
+  existeConfig:      (ruta)  => ipcRenderer.invoke('config:exists', ruta),
+  crearConfigDefault: (datos) => ipcRenderer.invoke('config:create-default', datos),
 
   // --- Lectura/escritura del config en NAS ---
   leerConfig:        (ruta)  => ipcRenderer.invoke('config:read', ruta),
@@ -28,6 +35,7 @@ contextBridge.exposeInMainWorld('fuzfuz', {
 
   // --- Diálogos nativos ---
   confirmarConflicto: (d) => ipcRenderer.invoke('dialog:confirmar-conflicto', d),
+  confirmar:          (d) => ipcRenderer.invoke('dialog:confirmar', d),
   mostrarInfo:        (d) => ipcRenderer.invoke('dialog:info', d),
   mostrarError:       (d) => ipcRenderer.invoke('dialog:error', d)
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';">
-  <title>FuzFuz · Calculadora</title>
+  <title>PackPrice · Calculadora de packs</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
   <!-- ================== PANTALLA: BIENVENIDA / PRIMER ARRANQUE ================== -->
   <section id="pantalla-bienvenida" class="pantalla pantalla-centro hidden">
     <div class="card card-bienvenida">
-      <h1>Bienvenido a FuzFuz Calculadora</h1>
+      <h1>Bienvenido a PackPrice</h1>
       <p class="lead">Para empezar, indica tu nombre y la ubicación del archivo de configuración compartido.</p>
 
       <div class="input-row">
@@ -23,13 +23,13 @@
       <div class="input-row">
         <label class="full-label">Archivo de configuración (config.js en el NAS)
           <div class="file-picker">
-            <input type="text" id="bv-ruta" class="full-width" placeholder="Ruta del archivo config.js" readonly>
+            <input type="text" id="bv-ruta" class="full-width" placeholder="Ruta del archivo config.js">
             <button id="btn-bv-explorar" class="btn-secondary">📁 Explorar...</button>
           </div>
         </label>
       </div>
 
-      <p class="hint">Por defecto debería estar en <code>Z:\Packs\config.js</code>. Si no es así, navega hasta donde lo tengas.</p>
+      <p class="hint">Por defecto se busca en <code>\\172.26.0.154\Paep\Packs\config.js</code> (o <code>Z:\Packs\config.js</code> si tienes la unidad mapeada). Si no existe el archivo, PackPrice puede crearlo con los valores por defecto.</p>
 
       <div id="bv-error" class="alert alert-error hidden"></div>
 
@@ -47,6 +47,7 @@
       <p class="hint">Comprueba que el NAS está accesible y la ruta del config es correcta.</p>
       <div class="actions">
         <button id="btn-error-reintentar" class="btn-primary">Reintentar</button>
+        <button id="btn-error-crear-default" class="btn-secondary hidden">Crear config con valores por defecto</button>
         <button id="btn-error-cambiar-ruta" class="btn-secondary">Cambiar ubicación...</button>
       </div>
     </div>
@@ -57,7 +58,7 @@
 
     <header class="topbar">
       <div class="brand">
-        <h1>FuzFuz</h1>
+        <h1>PackPrice</h1>
         <span class="tagline">Calculadora de packs</span>
       </div>
       <div class="topbar-info">
@@ -118,7 +119,7 @@
     <footer>
       <span>v<span id="cfg-version">-</span></span>
       <span>Modificado por: <span id="cfg-modificado-por">-</span></span>
-      <span>FuzFuz · uso interno</span>
+      <span>PackPrice · uso interno</span>
     </footer>
   </div>
 
@@ -179,7 +180,7 @@
         <div class="input-row">
           <label class="full-label">Archivo de configuración (config.js)
             <div class="file-picker">
-              <input type="text" id="aj-ruta" class="full-width" readonly>
+              <input type="text" id="aj-ruta" class="full-width">
               <button id="btn-aj-explorar" class="btn-secondary">📁 Cambiar...</button>
             </div>
           </label>
@@ -193,6 +194,6 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
