@@ -1,0 +1,698 @@
+/* ============================================================
+   FuzFuz Calculadora - Estilos V1
+   Paleta: gris azulado neutro modo claro
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   Variables
+   ---------------------------------------------------------- */
+:root {
+  /* Paleta neutra gris azulado */
+  --bg-page:        #E8ECF1;
+  --bg-card:        #F1F4F8;
+  --bg-card-alt:    #E4EAF1;
+  --bg-input:       #FBFCFD;
+  --border-color:   #CBD5E1;
+  --border-strong:  #94A3B8;
+
+  /* Texto */
+  --text-primary:   #1F2937;
+  --text-secondary: #64748B;
+  --text-muted:     #94A3B8;
+
+  /* Acento */
+  --accent:         #475569;
+  --accent-hover:   #334155;
+  --accent-light:   #E2E8F0;
+
+  /* Estados */
+  --success-bg:     #DCFCE7;
+  --success-text:   #166534;
+  --warn-bg:        #FEF3C7;
+  --warn-text:      #92400E;
+  --error-bg:       #FEE2E2;
+  --error-text:     #991B1B;
+
+  /* Sombras y radios */
+  --radius:         8px;
+  --radius-sm:      4px;
+  --shadow-sm:      0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md:      0 4px 12px rgba(15, 23, 42, 0.08);
+
+  /* Tipografía */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", monospace;
+}
+
+/* ----------------------------------------------------------
+   Reset y base
+   ---------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background-color: var(--bg-page);
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  margin: 0 0 0.5em 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+h1 { font-size: 1.4rem; }
+h2 { font-size: 1.15rem; }
+h3 { font-size: 1rem; }
+
+p {
+  margin: 0 0 0.75em 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ----------------------------------------------------------
+   Layout
+   ---------------------------------------------------------- */
+.topbar {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  letter-spacing: -0.02em;
+}
+
+.tagline {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px 16px 80px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  padding: 8px 24px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+}
+
+/* ----------------------------------------------------------
+   Tarjetas
+   ---------------------------------------------------------- */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.card-header h2 {
+  margin: 0;
+}
+
+/* ----------------------------------------------------------
+   Botones
+   ---------------------------------------------------------- */
+button {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 9px 16px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  font-weight: 500;
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--bg-card-alt);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+.btn-secondary:hover {
+  background: var(--accent-light);
+}
+
+.btn-link {
+  background: transparent;
+  color: var(--accent);
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+.btn-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* ----------------------------------------------------------
+   Selector de packs (grid de tarjetas seleccionables)
+   ---------------------------------------------------------- */
+.pack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.pack-option {
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.05s;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+.pack-option:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.pack-option:active {
+  transform: scale(0.99);
+}
+
+.pack-option .pack-nombre {
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.pack-option .pack-min {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ----------------------------------------------------------
+   Inputs y formularios
+   ---------------------------------------------------------- */
+input[type="number"],
+input[type="text"],
+input[type="password"] {
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  width: 100px;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus,
+input[type="password"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(71, 85, 105, 0.15);
+}
+
+input[type="number"].full-width,
+input[type="text"].full-width,
+input[type="password"].full-width {
+  width: 100%;
+}
+
+label {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-right: 16px;
+}
+
+.input-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.radio-group strong {
+  margin-right: 4px;
+  font-weight: 500;
+}
+
+.radio-group label {
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+  margin-right: 0;
+  cursor: pointer;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: normal;
+}
+
+/* ----------------------------------------------------------
+   Alertas / mensajes
+   ---------------------------------------------------------- */
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  margin: 12px 0;
+}
+
+.alert-error {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border: 1px solid #FECACA;
+}
+
+.alert-warn {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  border: 1px solid #FDE68A;
+}
+
+.alert-success {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border: 1px solid #BBF7D0;
+}
+
+/* ----------------------------------------------------------
+   Resultado del cálculo
+   ---------------------------------------------------------- */
+.resultado-block {
+  margin-bottom: 16px;
+}
+
+.resultado-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.resultado-meta span strong {
+  color: var(--text-primary);
+}
+
+.resultado-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+}
+
+.resultado-tabla td,
+.resultado-tabla th {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.resultado-tabla th {
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.resultado-tabla td.valor {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.resultado-tabla tr.total {
+  background: var(--success-bg);
+}
+
+.resultado-tabla tr.total td {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--success-text);
+  border-bottom: none;
+  padding: 12px 10px;
+}
+
+.resultado-admin {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: var(--bg-card-alt);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.resultado-admin h4 {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+}
+
+.resultado-admin .stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px 16px;
+  font-size: 0.9rem;
+}
+
+.resultado-admin .stats div strong {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+/* ----------------------------------------------------------
+   Modal admin
+   ---------------------------------------------------------- */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 16px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 720px;
+  max-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+  margin: 0;
+}
+
+.admin-section {
+  padding: 22px;
+  overflow-y: auto;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.admin-tab {
+  background: transparent;
+  border: none;
+  padding: 10px 14px;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-radius: 0;
+}
+
+.admin-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.admin-tab:hover:not(.active) {
+  color: var(--text-primary);
+}
+
+.admin-actions {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+.admin-grid label {
+  font-size: 0.9rem;
+  margin: 0;
+  color: var(--text-primary);
+  display: block;
+}
+
+.admin-grid label .hint {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.admin-grid input {
+  width: 100%;
+}
+
+.admin-subhead {
+  margin: 16px 0 8px 0;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 4px;
+}
+
+.admin-subhead:first-child {
+  margin-top: 0;
+}
+
+/* ----------------------------------------------------------
+   Pantallas auxiliares (bienvenida, error)
+   ---------------------------------------------------------- */
+.pantalla {
+  min-height: 100vh;
+}
+
+.pantalla-centro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.card-bienvenida {
+  max-width: 560px;
+  width: 100%;
+}
+
+.card-bienvenida h1 {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.lead {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.full-label {
+  display: block;
+  width: 100%;
+  flex-direction: column;
+  margin: 0;
+}
+
+.file-picker {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.file-picker input {
+  flex: 1;
+}
+
+.file-picker button {
+  white-space: nowrap;
+}
+
+.alert.alert-info {
+  background: #DBEAFE;
+  color: #1E3A8A;
+  border: 1px solid #BFDBFE;
+}
+
+/* ----------------------------------------------------------
+   Cabecera de la app (con info de usuario)
+   ---------------------------------------------------------- */
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.topbar-info {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-left: auto;
+  margin-right: 16px;
+}
+
+.topbar-info span {
+  white-space: nowrap;
+}
+
+.user-info, .cfg-info {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----------------------------------------------------------
+   Mini headings dentro de admin (Sin capucha 2 caras, etc.)
+   ---------------------------------------------------------- */
+.admin-mini-head {
+  font-weight: 500;
+  margin: 8px 0 4px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ----------------------------------------------------------
+   Códigos inline
+   ---------------------------------------------------------- */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  background: var(--bg-card-alt);
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border-color);
+}
+
+/* ----------------------------------------------------------
+   Responsive básico
+   ---------------------------------------------------------- */
+@media (max-width: 600px) {
+  .container {
+    padding: 16px 12px 80px 12px;
+  }
+  .card {
+    padding: 16px;
+  }
+  .topbar {
+    padding: 10px 14px;
+  }
+  .pack-grid {
+    grid-template-columns: 1fr;
+  }
+  .actions {
+    flex-direction: column;
+  }
+  .actions button {
+    width: 100%;
+  }
+  footer {
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+  }
+}

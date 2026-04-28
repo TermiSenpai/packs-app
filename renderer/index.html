@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';">
+  <title>FuzFuz · Calculadora</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ================== PANTALLA: BIENVENIDA / PRIMER ARRANQUE ================== -->
+  <section id="pantalla-bienvenida" class="pantalla pantalla-centro hidden">
+    <div class="card card-bienvenida">
+      <h1>Bienvenido a FuzFuz Calculadora</h1>
+      <p class="lead">Para empezar, indica tu nombre y la ubicación del archivo de configuración compartido.</p>
+
+      <div class="input-row">
+        <label class="full-label">Tu nombre
+          <input type="text" id="bv-nombre" class="full-width" placeholder="Ej: Alberto, Fede, ...">
+        </label>
+      </div>
+
+      <div class="input-row">
+        <label class="full-label">Archivo de configuración (config.js en el NAS)
+          <div class="file-picker">
+            <input type="text" id="bv-ruta" class="full-width" placeholder="Ruta del archivo config.js" readonly>
+            <button id="btn-bv-explorar" class="btn-secondary">📁 Explorar...</button>
+          </div>
+        </label>
+      </div>
+
+      <p class="hint">Por defecto debería estar en <code>Z:\Packs\config.js</code>. Si no es así, navega hasta donde lo tengas.</p>
+
+      <div id="bv-error" class="alert alert-error hidden"></div>
+
+      <div class="actions">
+        <button id="btn-bv-empezar" class="btn-primary" disabled>Empezar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================== PANTALLA: ERROR DE CARGA ================== -->
+  <section id="pantalla-error" class="pantalla pantalla-centro hidden">
+    <div class="card card-bienvenida">
+      <h1>⚠ No se pudo cargar la configuración</h1>
+      <p id="error-detalle" class="alert alert-error"></p>
+      <p class="hint">Comprueba que el NAS está accesible y la ruta del config es correcta.</p>
+      <div class="actions">
+        <button id="btn-error-reintentar" class="btn-primary">Reintentar</button>
+        <button id="btn-error-cambiar-ruta" class="btn-secondary">Cambiar ubicación...</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================== PANTALLA: APP PRINCIPAL ================== -->
+  <div id="pantalla-app" class="hidden">
+
+    <header class="topbar">
+      <div class="brand">
+        <h1>FuzFuz</h1>
+        <span class="tagline">Calculadora de packs</span>
+      </div>
+      <div class="topbar-info">
+        <span class="user-info">👤 <span id="info-usuario">-</span></span>
+        <span class="cfg-info">⚙ <span id="info-fecha-cfg">-</span></span>
+      </div>
+      <div class="topbar-actions">
+        <button id="btn-recargar" class="btn-link" title="Vuelve a leer config.js del NAS">↻ Recargar config</button>
+        <button id="btn-ajustes" class="btn-link" title="Cambiar ruta del config, nombre, etc.">⚙ Ajustes</button>
+        <button id="btn-admin-toggle" class="btn-secondary">🔒 Admin</button>
+      </div>
+    </header>
+
+    <main class="container">
+
+      <!-- Selección de pack -->
+      <section class="card" id="seccion-paso1">
+        <h2>1. Tipo de pack</h2>
+        <div id="lista-packs" class="pack-grid"></div>
+      </section>
+
+      <!-- Inputs -->
+      <section class="card hidden" id="seccion-paso2">
+        <div class="card-header">
+          <h2 id="pack-titulo">2. Datos del pedido</h2>
+          <button id="btn-cambiar-pack" class="btn-link">← Cambiar pack</button>
+        </div>
+
+        <div id="inputs-pack"></div>
+
+        <h3>Tallas grandes (opcional)</h3>
+        <p class="hint">Las tallas 4XL y 5XL+ se facturan con recargo directo al cliente. Las tallas hasta 3XL ya están amortizadas en el PVP del pack.</p>
+        <div class="input-row">
+          <label>4XL <span class="hint">(+<span data-cfg="recargo_4xl_eur">3</span>€/prenda)</span>
+            <input type="number" id="cant_4xl" min="0" value="0">
+          </label>
+          <label>5XL+ <span class="hint">(+<span data-cfg="recargo_5xl_eur">5</span>€/prenda)</span>
+            <input type="number" id="cant_5xl" min="0" value="0">
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="btn-calcular" class="btn-primary">Calcular</button>
+          <button id="btn-reset" class="btn-secondary">Reiniciar</button>
+        </div>
+
+        <div id="error-msg" class="alert alert-error hidden"></div>
+      </section>
+
+      <!-- Resultado -->
+      <section class="card hidden" id="seccion-resultado">
+        <h2>Resultado</h2>
+        <div id="resultado-content"></div>
+      </section>
+
+    </main>
+
+    <footer>
+      <span>v<span id="cfg-version">-</span></span>
+      <span>Modificado por: <span id="cfg-modificado-por">-</span></span>
+      <span>FuzFuz · uso interno</span>
+    </footer>
+  </div>
+
+  <!-- ================== MODAL: ADMIN ================== -->
+  <div id="admin-overlay" class="overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Modo administrador</h2>
+        <button id="btn-cerrar-admin" class="btn-link">✕</button>
+      </div>
+
+      <div id="admin-login" class="admin-section">
+        <p>Introduce la clave de administrador:</p>
+        <div class="input-row">
+          <input type="password" id="admin-clave" placeholder="Clave" class="full-width">
+          <button id="btn-admin-login" class="btn-primary">Entrar</button>
+        </div>
+        <div id="admin-login-error" class="alert alert-error hidden">Clave incorrecta</div>
+      </div>
+
+      <div id="admin-editor" class="admin-section hidden">
+        <p class="alert alert-info">📝 Editas valores que se guardarán directamente en el archivo del NAS al pulsar "Guardar". Los demás usuarios verán los cambios al pulsar "Recargar config".</p>
+
+        <div class="admin-tabs">
+          <button class="admin-tab active" data-tab="parametros">Parámetros</button>
+          <button class="admin-tab" data-tab="modelos">Modelos Roly</button>
+          <button class="admin-tab" data-tab="tramos">Tramos</button>
+          <button class="admin-tab" data-tab="packs">Packs (PVP)</button>
+        </div>
+
+        <div id="admin-tab-content"></div>
+
+        <div class="actions admin-actions">
+          <button id="btn-guardar-config" class="btn-primary">💾 Guardar en NAS</button>
+          <button id="btn-cancelar-admin" class="btn-secondary">Cancelar cambios</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== MODAL: AJUSTES LOCALES ================== -->
+  <div id="ajustes-overlay" class="overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Ajustes locales (este PC)</h2>
+        <button id="btn-cerrar-ajustes" class="btn-link">✕</button>
+      </div>
+
+      <div class="admin-section">
+        <p class="hint">Estos ajustes se guardan en este PC y no afectan a los demás usuarios.</p>
+
+        <div class="input-row">
+          <label class="full-label">Tu nombre
+            <input type="text" id="aj-nombre" class="full-width">
+          </label>
+        </div>
+
+        <div class="input-row">
+          <label class="full-label">Archivo de configuración (config.js)
+            <div class="file-picker">
+              <input type="text" id="aj-ruta" class="full-width" readonly>
+              <button id="btn-aj-explorar" class="btn-secondary">📁 Cambiar...</button>
+            </div>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="btn-aj-guardar" class="btn-primary">Guardar y recargar</button>
+          <button id="btn-aj-cancelar" class="btn-secondary">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

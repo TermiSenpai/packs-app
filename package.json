@@ -1,0 +1,43 @@
+{
+  "name": "fuzfuz-calculadora",
+  "version": "2.0.0",
+  "description": "Calculadora de packs FuzFuz - app de escritorio interna",
+  "main": "main.js",
+  "author": "FuzFuz",
+  "private": true,
+  "scripts": {
+    "dev": "electron .",
+    "build:win": "electron-builder --win --x64",
+    "build:win-portable": "electron-builder --win portable --x64"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.0"
+  },
+  "build": {
+    "appId": "com.fuzfuz.calculadora",
+    "productName": "FuzFuz Calculadora",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "icon.png",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "icon.png"
+    },
+    "portable": {
+      "artifactName": "FuzFuz-Calculadora-${version}-portable.exe"
+    }
+  }
+}
