@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" font-family="-apple-system, Segoe UI, Inter, sans-serif">
+  <rect width="1200" height="620" fill="#F1F4F8"/>
+  <g transform="translate(80,60)">
+    <text fill="#5A6478" font-size="13" font-weight="700" letter-spacing="2">CAPÍTULO 02 · MODELO DE NEGOCIO</text>
+    <text y="50" fill="#0F1A2B" font-size="36" font-weight="700">Anatomía del coste de una prenda.</text>
+    <text y="84" fill="#5A6478" font-size="16">Desglose unitario para una camiseta BEAGLE estampada a 2 caras, pedido tramo T1.</text>
+  </g>
+  <g transform="translate(80,200)">
+    <rect width="700" height="380" rx="16" fill="#FFFFFF" stroke="#E4E9F2"/>
+    <g font-family="ui-monospace, Consolas, monospace">
+      <g transform="translate(40,50)">
+        <rect width="12" height="20" fill="#3D7BD9"/>
+        <text x="28" y="16" fill="#0F1A2B" font-size="14" font-weight="600">Roly BEAGLE</text>
+        <text x="640" y="16" fill="#0F1A2B" font-size="14" font-weight="600" text-anchor="end">1,73 €</text>
+      </g>
+      <g transform="translate(40,90)">
+        <rect width="12" height="20" fill="#5A6478"/>
+        <text x="28" y="16" fill="#0F1A2B" font-size="14">Envío Roly prorrateado (5,90 €/40 prendas)</text>
+        <text x="640" y="16" fill="#0F1A2B" font-size="14" text-anchor="end">0,15 €</text>
+      </g>
+      <g transform="translate(40,130)">
+        <rect width="12" height="20" fill="#3D7BD9"/>
+        <text x="28" y="16" fill="#0F1A2B" font-size="14">DTF (0,40 m × 1,25 €)</text>
+        <text x="640" y="16" fill="#0F1A2B" font-size="14" text-anchor="end">0,50 €</text>
+      </g>
+      <g transform="translate(40,170)">
+        <rect width="12" height="20" fill="#5A6478"/>
+        <text x="28" y="16" fill="#0F1A2B" font-size="14">Planchado (2 caras × 0,30 €)</text>
+        <text x="640" y="16" fill="#0F1A2B" font-size="14" text-anchor="end">0,60 €</text>
+      </g>
+      <g transform="translate(40,210)">
+        <rect width="12" height="20" fill="#D98A1F"/>
+        <text x="28" y="16" fill="#0F1A2B" font-size="14">Merma 10%</text>
+        <text x="640" y="16" fill="#0F1A2B" font-size="14" text-anchor="end">0,30 €</text>
+      </g>
+      <g transform="translate(40,250)">
+        <rect width="12" height="20" fill="#3D7BD9"/>
+        <text x="28" y="16" fill="#0F1A2B" font-size="14">MO (5 min × 15 €/h)</text>
+        <text x="640" y="16" fill="#0F1A2B" font-size="14" text-anchor="end">1,25 €</text>
+      </g>
+      <g transform="translate(40,290)">
+        <rect width="12" height="20" fill="#5A6478"/>
+        <text x="28" y="16" fill="#0F1A2B" font-size="14">Indirectos (luz · packaging)</text>
+        <text x="640" y="16" fill="#0F1A2B" font-size="14" text-anchor="end">0,30 €</text>
+      </g>
+      <line x1="40" x2="680" y1="335" y2="335" stroke="#0F1A2B" stroke-width="1.5"/>
+      <g transform="translate(40,355)">
+        <text x="0" y="0" fill="#0F1A2B" font-size="15" font-weight="700">Coste total camiseta</text>
+        <text x="640" y="0" fill="#1FA86A" font-size="18" font-weight="700" text-anchor="end">4,83 €</text>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(820,200)">
+    <rect width="300" height="380" rx="16" fill="#0F1A2B"/>
+    <text x="28" y="48" fill="#A6B0C2" font-size="12" font-weight="600" letter-spacing="1.5">PVP TARIFA T1 · 2 CARAS</text>
+    <text x="28" y="118" fill="#FFFFFF" font-size="48" font-weight="700" font-family="ui-monospace, Consolas, monospace">9,95 €</text>
+    <text x="28" y="148" fill="#A6B0C2" font-size="13">IVA 21% incluido</text>
+    <line x1="28" x2="272" y1="180" y2="180" stroke="#1A2740"/>
+    <text x="28" y="210" fill="#A6B0C2" font-size="12">Base imponible</text>
+    <text x="272" y="210" fill="#FFFFFF" font-size="13" font-weight="600" text-anchor="end" font-family="ui-monospace, Consolas, monospace">8,22 €</text>
+    <text x="28" y="240" fill="#A6B0C2" font-size="12">Coste real</text>
+    <text x="272" y="240" fill="#FFFFFF" font-size="13" font-weight="600" text-anchor="end" font-family="ui-monospace, Consolas, monospace">4,83 €</text>
+    <line x1="28" x2="272" y1="260" y2="260" stroke="#1A2740"/>
+    <text x="28" y="290" fill="#A6B0C2" font-size="12">Margen €</text>
+    <text x="272" y="290" fill="#1FA86A" font-size="13" font-weight="700" text-anchor="end" font-family="ui-monospace, Consolas, monospace">3,39 €</text>
+    <text x="28" y="320" fill="#A6B0C2" font-size="12">Margen sobre PVP</text>
+    <text x="272" y="320" fill="#1FA86A" font-size="13" font-weight="700" text-anchor="end" font-family="ui-monospace, Consolas, monospace">34 %</text>
+  </g>
+</svg>

@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" font-family="-apple-system, Segoe UI, Inter, sans-serif">
+  <rect width="1200" height="720" fill="#FFFFFF"/>
+  <g transform="translate(80,60)">
+    <text fill="#5A6478" font-size="13" font-weight="700" letter-spacing="2">CAPÍTULO 04 · ARQUITECTURA</text>
+    <text y="50" fill="#0F1A2B" font-size="32" font-weight="700">Tres procesos, una frontera segura.</text>
+    <text y="82" fill="#5A6478" font-size="16">El renderer nunca toca el filesystem. Todo pasa por preload y vuelve por IPC.</text>
+  </g>
+  <g transform="translate(80,200)">
+    <rect width="320" height="380" rx="16" fill="#0F1A2B"/>
+    <text x="24" y="36" fill="#A6B0C2" font-size="11" font-weight="700" letter-spacing="1.5">PROCESO PRINCIPAL · main.js</text>
+    <text x="24" y="68" fill="#FFFFFF" font-size="20" font-weight="700">Node.js</text>
+    <text x="24" y="92" fill="#A6B0C2" font-size="13">Acceso real a Windows.</text>
+    <line x1="24" x2="296" y1="120" y2="120" stroke="#1A2740"/>
+    <g font-family="ui-monospace, Consolas, monospace" font-size="12">
+      <g transform="translate(24,140)">
+        <rect width="272" height="32" rx="6" fill="#1A2740"/>
+        <text x="14" y="20" fill="#3D7BD9">ipcMain.handle('config:read')</text>
+      </g>
+      <g transform="translate(24,180)">
+        <rect width="272" height="32" rx="6" fill="#1A2740"/>
+        <text x="14" y="20" fill="#3D7BD9">ipcMain.handle('config:write')</text>
+      </g>
+      <g transform="translate(24,220)">
+        <rect width="272" height="32" rx="6" fill="#1A2740"/>
+        <text x="14" y="20" fill="#3D7BD9">ipcMain.handle('dialog:select')</text>
+      </g>
+      <g transform="translate(24,260)">
+        <rect width="272" height="32" rx="6" fill="#1A2740"/>
+        <text x="14" y="20" fill="#3D7BD9">ipcMain.handle('settings:read')</text>
+      </g>
+      <g transform="translate(24,300)">
+        <rect width="272" height="32" rx="6" fill="#1A2740"/>
+        <text x="14" y="20" fill="#A6B0C2">fs · path · crypto · vm</text>
+      </g>
+    </g>
+    <text x="24" y="358" fill="#A6B0C2" font-size="12">Es la única zona con permisos.</text>
+  </g>
+  <g transform="translate(440,200)">
+    <rect width="320" height="380" rx="16" fill="#3D7BD9"/>
+    <text x="24" y="36" fill="#FFFFFF" font-size="11" font-weight="700" letter-spacing="1.5" opacity="0.85">PUENTE · preload.js</text>
+    <text x="24" y="68" fill="#FFFFFF" font-size="20" font-weight="700">contextBridge</text>
+    <text x="24" y="92" fill="#FFFFFF" font-size="13" opacity="0.85">Solo lo justo y necesario.</text>
+    <line x1="24" x2="296" y1="120" y2="120" stroke="#FFFFFF" opacity="0.2"/>
+    <g font-family="ui-monospace, Consolas, monospace" font-size="12" fill="#FFFFFF">
+      <g transform="translate(24,140)">
+        <rect width="272" height="32" rx="6" fill="#FFFFFF" opacity="0.18"/>
+        <text x="14" y="20">window.packprice.configRead</text>
+      </g>
+      <g transform="translate(24,180)">
+        <rect width="272" height="32" rx="6" fill="#FFFFFF" opacity="0.18"/>
+        <text x="14" y="20">window.packprice.configWrite</text>
+      </g>
+      <g transform="translate(24,220)">
+        <rect width="272" height="32" rx="6" fill="#FFFFFF" opacity="0.18"/>
+        <text x="14" y="20">window.packprice.selectConfig</text>
+      </g>
+      <g transform="translate(24,260)">
+        <rect width="272" height="32" rx="6" fill="#FFFFFF" opacity="0.18"/>
+        <text x="14" y="20">window.packprice.settingsRead</text>
+      </g>
+      <g transform="translate(24,300)">
+        <rect width="272" height="32" rx="6" fill="#FFFFFF" opacity="0.18"/>
+        <text x="14" y="20">window.packprice.confirmConflict</text>
+      </g>
+    </g>
+    <text x="24" y="358" fill="#FFFFFF" font-size="12" opacity="0.85">contextIsolation · sandbox limitado.</text>
+  </g>
+  <g transform="translate(800,200)">
+    <rect width="320" height="380" rx="16" fill="#FFFFFF" stroke="#E4E9F2"/>
+    <text x="24" y="36" fill="#5A6478" font-size="11" font-weight="700" letter-spacing="1.5">RENDERER · Chromium</text>
+    <text x="24" y="68" fill="#0F1A2B" font-size="20" font-weight="700">UI + cálculo puro</text>
+    <text x="24" y="92" fill="#5A6478" font-size="13">Vanilla HTML/CSS/JS.</text>
+    <line x1="24" x2="296" y1="120" y2="120" stroke="#E4E9F2"/>
+    <g font-family="ui-monospace, Consolas, monospace" font-size="12">
+      <g transform="translate(24,140)">
+        <rect width="272" height="32" rx="6" fill="#F1F4F8"/>
+        <text x="14" y="20" fill="#0F1A2B">renderer/index.html</text>
+      </g>
+      <g transform="translate(24,180)">
+        <rect width="272" height="32" rx="6" fill="#F1F4F8"/>
+        <text x="14" y="20" fill="#0F1A2B">renderer/app.js</text>
+      </g>
+      <g transform="translate(24,220)">
+        <rect width="272" height="32" rx="6" fill="#F1F4F8"/>
+        <text x="14" y="20" fill="#0F1A2B">renderer/calculo.js</text>
+      </g>
+      <g transform="translate(24,260)">
+        <rect width="272" height="32" rx="6" fill="#F1F4F8"/>
+        <text x="14" y="20" fill="#0F1A2B">renderer/admin.js</text>
+      </g>
+      <g transform="translate(24,300)">
+        <rect width="272" height="32" rx="6" fill="#F1F4F8"/>
+        <text x="14" y="20" fill="#0F1A2B">renderer/styles.css</text>
+      </g>
+    </g>
+    <text x="24" y="358" fill="#5A6478" font-size="12">Sin Node, sin fs, sin require.</text>
+  </g>
+  <g stroke="#5A6478" stroke-width="1.5" fill="none">
+    <path d="M 400 380 L 440 380" marker-end="url(#arr)"/>
+    <path d="M 760 380 L 800 380" marker-end="url(#arr)"/>
+  </g>
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5A6478"/>
+    </marker>
+  </defs>
+  <g transform="translate(80,620)">
+    <text fill="#0F1A2B" font-size="14" font-weight="600">Regla de oro</text>
+    <text y="22" fill="#5A6478" font-size="13">Si el renderer necesita una capacidad nueva, pasa por los tres pasos: handler IPC → bridge → llamada async. Nunca atajos.</text>
+  </g>
+</svg>

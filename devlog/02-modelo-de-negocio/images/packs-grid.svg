@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" font-family="-apple-system, Segoe UI, Inter, sans-serif">
+  <rect width="1200" height="600" fill="#F1F4F8"/>
+  <g transform="translate(80,60)">
+    <text fill="#0F1A2B" font-size="28" font-weight="700">Cinco packs comerciales.</text>
+    <text y="32" fill="#5A6478" font-size="15">Mínimo 10 unidades por pedido. Por debajo, queda fuera de la app y se cotiza como mini-grupo manual.</text>
+  </g>
+  <g transform="translate(80,160)">
+    <g transform="translate(0,0)">
+      <rect width="220" height="180" rx="16" fill="#0F1A2B"/>
+      <rect x="20" y="20" width="40" height="40" rx="8" fill="#3D7BD9"/>
+      <text x="20" y="100" fill="#FFFFFF" font-size="16" font-weight="700">Pack peña</text>
+      <text x="20" y="124" fill="#A6B0C2" font-size="12">Camiseta + sudadera</text>
+      <text x="20" y="142" fill="#A6B0C2" font-size="12">por persona.</text>
+      <rect x="20" y="148" width="116" height="22" rx="11" fill="#1A2740"/>
+      <text x="32" y="163" fill="#3D7BD9" font-size="11" font-weight="600">Desde 22,95 €</text>
+    </g>
+    <g transform="translate(240,0)">
+      <rect width="220" height="180" rx="16" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <rect x="20" y="20" width="40" height="40" rx="8" fill="#E4EEFC"/>
+      <text x="20" y="100" fill="#0F1A2B" font-size="16" font-weight="700">Solo camisetas</text>
+      <text x="20" y="124" fill="#5A6478" font-size="12">BEAGLE estampada</text>
+      <text x="20" y="142" fill="#5A6478" font-size="12">a 1 o 2 caras.</text>
+      <rect x="20" y="148" width="100" height="22" rx="11" fill="#E4EEFC"/>
+      <text x="32" y="163" fill="#1F4FA3" font-size="11" font-weight="600">Desde 6,99 €</text>
+    </g>
+    <g transform="translate(480,0)">
+      <rect width="220" height="180" rx="16" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <rect x="20" y="20" width="40" height="40" rx="8" fill="#E4EEFC"/>
+      <text x="20" y="100" fill="#0F1A2B" font-size="16" font-weight="700">Sudaderas s/cap.</text>
+      <text x="20" y="124" fill="#5A6478" font-size="12">CLASICA, todas las</text>
+      <text x="20" y="142" fill="#5A6478" font-size="12">tallas y caras.</text>
+      <rect x="20" y="148" width="110" height="22" rx="11" fill="#E4EEFC"/>
+      <text x="32" y="163" fill="#1F4FA3" font-size="11" font-weight="600">Desde 10,45 €</text>
+    </g>
+    <g transform="translate(720,0)">
+      <rect width="220" height="180" rx="16" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <rect x="20" y="20" width="40" height="40" rx="8" fill="#E4EEFC"/>
+      <text x="20" y="100" fill="#0F1A2B" font-size="16" font-weight="700">Sudaderas c/cap.</text>
+      <text x="20" y="124" fill="#5A6478" font-size="12">URBAN, capucha y</text>
+      <text x="20" y="142" fill="#5A6478" font-size="12">cordón ajustable.</text>
+      <rect x="20" y="148" width="110" height="22" rx="11" fill="#E4EEFC"/>
+      <text x="32" y="163" fill="#1F4FA3" font-size="11" font-weight="600">Desde 11,95 €</text>
+    </g>
+    <g transform="translate(960,0)">
+      <rect width="220" height="180" rx="16" fill="#FFFFFF" stroke="#E4E9F2" stroke-dasharray="4 4"/>
+      <rect x="20" y="20" width="40" height="40" rx="8" fill="#FBEFD9"/>
+      <text x="20" y="100" fill="#0F1A2B" font-size="16" font-weight="700">Mixto sudaderas</text>
+      <text x="20" y="124" fill="#5A6478" font-size="12">URBAN + CLASICA,</text>
+      <text x="20" y="142" fill="#5A6478" font-size="12">tramo sobre el total.</text>
+      <rect x="20" y="148" width="92" height="22" rx="11" fill="#FBEFD9"/>
+      <text x="32" y="163" fill="#D98A1F" font-size="11" font-weight="600">Personalizable</text>
+    </g>
+  </g>
+  <g transform="translate(80,400)">
+    <rect width="1040" height="120" rx="16" fill="#FFFFFF" stroke="#E4E9F2"/>
+    <text x="32" y="40" fill="#0F1A2B" font-size="14" font-weight="700">Ejemplo · Pack mixto sudaderas</text>
+    <text x="32" y="68" fill="#5A6478" font-size="13" font-family="ui-monospace, Consolas, monospace">7 URBAN + 5 CLASICA → total 12 → tramo T1 → 7 × 16,95 € + 5 × 14,95 € = </text>
+    <text x="32" y="98" fill="#1FA86A" font-size="20" font-weight="700" font-family="ui-monospace, Consolas, monospace">193,40 € (IVA inc.)</text>
+  </g>
+</svg>

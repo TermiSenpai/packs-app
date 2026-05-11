@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" font-family="-apple-system, Segoe UI, Inter, sans-serif">
+  <rect width="1200" height="720" fill="#FFFFFF"/>
+  <g transform="translate(80,60)">
+    <text fill="#5A6478" font-size="13" font-weight="700" letter-spacing="2">CAPÍTULO 06 · SISTEMA DE DISEÑO</text>
+    <text y="50" fill="#0F1A2B" font-size="32" font-weight="700">Paleta gris azulada, modo claro.</text>
+    <text y="84" fill="#5A6478" font-size="16">Once tokens cubren toda la app. Lo demás se compone con ellos.</text>
+  </g>
+  <g transform="translate(80,200)" font-family="ui-monospace, Consolas, monospace" font-size="12">
+    <g transform="translate(0,0)">
+      <rect width="240" height="120" rx="14" fill="#0F1A2B"/>
+      <text x="20" y="36" fill="#FFFFFF" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">surface-inverse</text>
+      <text x="20" y="58" fill="#A6B0C2">#0F1A2B</text>
+      <text x="20" y="100" fill="#A6B0C2" font-family="-apple-system, Segoe UI, Inter, sans-serif">Hero · precio en vivo</text>
+    </g>
+    <g transform="translate(260,0)">
+      <rect width="240" height="120" rx="14" fill="#3D7BD9"/>
+      <text x="20" y="36" fill="#FFFFFF" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">accent-primary</text>
+      <text x="20" y="58" fill="#FFFFFF" opacity="0.8">#3D7BD9</text>
+      <text x="20" y="100" fill="#FFFFFF" opacity="0.8" font-family="-apple-system, Segoe UI, Inter, sans-serif">Botones · enlaces · foco</text>
+    </g>
+    <g transform="translate(520,0)">
+      <rect width="240" height="120" rx="14" fill="#E4EEFC"/>
+      <text x="20" y="36" fill="#1F4FA3" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">accent-soft</text>
+      <text x="20" y="58" fill="#1F4FA3">#E4EEFC</text>
+      <text x="20" y="100" fill="#1F4FA3" font-family="-apple-system, Segoe UI, Inter, sans-serif">Badges · hints informativos</text>
+    </g>
+    <g transform="translate(780,0)">
+      <rect width="240" height="120" rx="14" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <text x="20" y="36" fill="#0F1A2B" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">surface-secondary</text>
+      <text x="20" y="58" fill="#5A6478">#FFFFFF</text>
+      <text x="20" y="100" fill="#5A6478" font-family="-apple-system, Segoe UI, Inter, sans-serif">Tarjetas · modales · campos</text>
+    </g>
+    <g transform="translate(0,140)">
+      <rect width="240" height="120" rx="14" fill="#F1F4F8"/>
+      <text x="20" y="36" fill="#0F1A2B" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">surface-primary</text>
+      <text x="20" y="58" fill="#5A6478">#F1F4F8</text>
+      <text x="20" y="100" fill="#5A6478" font-family="-apple-system, Segoe UI, Inter, sans-serif">Fondo de página</text>
+    </g>
+    <g transform="translate(260,140)">
+      <rect width="240" height="120" rx="14" fill="#1FA86A"/>
+      <text x="20" y="36" fill="#FFFFFF" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">success</text>
+      <text x="20" y="58" fill="#FFFFFF" opacity="0.85">#1FA86A</text>
+      <text x="20" y="100" fill="#FFFFFF" opacity="0.85" font-family="-apple-system, Segoe UI, Inter, sans-serif">Margen · NAS conectado</text>
+    </g>
+    <g transform="translate(520,140)">
+      <rect width="240" height="120" rx="14" fill="#D98A1F"/>
+      <text x="20" y="36" fill="#FFFFFF" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">warning</text>
+      <text x="20" y="58" fill="#FFFFFF" opacity="0.85">#D98A1F</text>
+      <text x="20" y="100" fill="#FFFFFF" opacity="0.85" font-family="-apple-system, Segoe UI, Inter, sans-serif">Recargo 4XL · banners admin</text>
+    </g>
+    <g transform="translate(780,140)">
+      <rect width="240" height="120" rx="14" fill="#D24D4D"/>
+      <text x="20" y="36" fill="#FFFFFF" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">danger</text>
+      <text x="20" y="58" fill="#FFFFFF" opacity="0.85">#D24D4D</text>
+      <text x="20" y="100" fill="#FFFFFF" opacity="0.85" font-family="-apple-system, Segoe UI, Inter, sans-serif">Errores · NAS desconectado</text>
+    </g>
+  </g>
+  <g transform="translate(80,500)">
+    <text fill="#0F1A2B" font-size="20" font-weight="700">Tipografía</text>
+    <text y="32" fill="#5A6478" font-size="14">Inter para cuerpo y títulos. Geist Mono para datos numéricos.</text>
+    <g transform="translate(0,60)">
+      <rect width="500" height="120" rx="14" fill="#F1F4F8"/>
+      <text x="24" y="40" fill="#0F1A2B" font-size="32" font-weight="700">Inter — Pack peña</text>
+      <text x="24" y="78" fill="#5A6478" font-size="14">Cuerpo 14, line-height 1.5. Sans humanista, perfecta a baja resolución.</text>
+      <text x="24" y="106" fill="#5A6478" font-size="13" font-style="italic">"PackPrice — calculadora de packs DTF"</text>
+    </g>
+    <g transform="translate(520,60)">
+      <rect width="500" height="120" rx="14" fill="#0F1A2B"/>
+      <text x="24" y="40" fill="#FFFFFF" font-size="32" font-weight="700" font-family="ui-monospace, Consolas, monospace">311,40 €</text>
+      <text x="24" y="78" fill="#A6B0C2" font-size="14">Geist Mono para precios, IVA y totales.</text>
+      <text x="24" y="106" fill="#A6B0C2" font-size="13" font-family="ui-monospace, Consolas, monospace">12 packs · 25,95 € · −15%</text>
+    </g>
+  </g>
+</svg>

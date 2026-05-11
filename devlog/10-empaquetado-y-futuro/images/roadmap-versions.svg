@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 720" font-family="-apple-system, Segoe UI, Inter, sans-serif">
+  <rect width="1320" height="720" fill="#FFFFFF"/>
+  <g transform="translate(80,60)">
+    <text fill="#5A6478" font-size="13" font-weight="700" letter-spacing="2">CAPÍTULO 10 · EMPAQUETADO Y FUTURO</text>
+    <text y="50" fill="#0F1A2B" font-size="32" font-weight="700">Seis versiones de un mismo problema.</text>
+    <text y="82" fill="#5A6478" font-size="16">De la Excel a una calculadora completa con catálogo abierto y reglas de descuento.</text>
+  </g>
+  <line x1="120" y1="280" x2="1240" y2="280" stroke="#CDD5E2" stroke-width="2"/>
+  <g transform="translate(120,180)">
+    <circle cx="0" cy="100" r="14" fill="#FFFFFF" stroke="#5A6478" stroke-width="2"/>
+    <rect x="-90" y="0" width="180" height="80" rx="12" fill="#FFFFFF" stroke="#E4E9F2"/>
+    <text x="-78" y="22" fill="#5A6478" font-size="12" font-weight="700" letter-spacing="1">V0</text>
+    <text x="-78" y="44" fill="#0F1A2B" font-size="14" font-weight="700">Excel + DOCX</text>
+    <text x="-78" y="66" fill="#5A6478" font-size="11">Estudio interno con bug del buffer 3XL.</text>
+    <text x="-12" y="170" fill="#5A6478" font-size="11" font-family="ui-monospace, Consolas, monospace">Sesión 1</text>
+  </g>
+  <g transform="translate(344,180)">
+    <circle cx="0" cy="100" r="14" fill="#FFFFFF" stroke="#5A6478" stroke-width="2"/>
+    <rect x="-90" y="0" width="180" height="80" rx="12" fill="#FFFFFF" stroke="#E4E9F2"/>
+    <text x="-78" y="22" fill="#5A6478" font-size="12" font-weight="700" letter-spacing="1">V1</text>
+    <text x="-78" y="44" fill="#0F1A2B" font-size="14" font-weight="700">Web file://</text>
+    <text x="-78" y="66" fill="#5A6478" font-size="11">Prototipo HTML, sin escritura al NAS.</text>
+    <text x="-22" y="170" fill="#5A6478" font-size="11" font-family="ui-monospace, Consolas, monospace">Sesión 2a</text>
+  </g>
+  <g transform="translate(568,180)">
+    <circle cx="0" cy="100" r="18" fill="#3D7BD9"/>
+    <text x="-7" y="106" fill="#FFFFFF" font-size="14" font-weight="700">★</text>
+    <rect x="-100" y="0" width="200" height="80" rx="12" fill="#0F1A2B"/>
+    <text x="-86" y="22" fill="#3D7BD9" font-size="12" font-weight="700" letter-spacing="1">V2 · ACTUAL</text>
+    <text x="-86" y="44" fill="#FFFFFF" font-size="14" font-weight="700">Electron portable .exe</text>
+    <text x="-86" y="66" fill="#A6B0C2" font-size="11">Beta lista para temporada de peñas.</text>
+    <text x="-22" y="170" fill="#0F1A2B" font-size="11" font-family="ui-monospace, Consolas, monospace" font-weight="700">2026-04</text>
+  </g>
+  <g transform="translate(792,180)">
+    <circle cx="0" cy="100" r="14" fill="#FFFFFF" stroke="#CDD5E2" stroke-width="2"/>
+    <rect x="-90" y="0" width="180" height="80" rx="12" fill="#FFFFFF" stroke="#E4E9F2" stroke-dasharray="4 4"/>
+    <text x="-78" y="22" fill="#5A6478" font-size="12" font-weight="700" letter-spacing="1">V3 · PRÓXIMO</text>
+    <text x="-78" y="44" fill="#0F1A2B" font-size="14" font-weight="700">Histórico + PDF</text>
+    <text x="-78" y="66" fill="#5A6478" font-size="11">Presupuestos guardados, exportar PDF.</text>
+    <text x="-15" y="170" fill="#5A6478" font-size="11" font-family="ui-monospace, Consolas, monospace">~2026-Q3</text>
+  </g>
+  <g transform="translate(1016,180)">
+    <circle cx="0" cy="100" r="14" fill="#FFFFFF" stroke="#CDD5E2" stroke-width="2"/>
+    <rect x="-90" y="0" width="180" height="80" rx="12" fill="#FFFFFF" stroke="#E4E9F2" stroke-dasharray="4 4"/>
+    <text x="-78" y="22" fill="#5A6478" font-size="12" font-weight="700" letter-spacing="1">V4 · HORIZONTE</text>
+    <text x="-78" y="44" fill="#0F1A2B" font-size="14" font-weight="700">Más versatilidad</text>
+    <text x="-78" y="66" fill="#5A6478" font-size="11">Packs libres, catálogo, descuentos.</text>
+    <text x="-22" y="170" fill="#5A6478" font-size="11" font-family="ui-monospace, Consolas, monospace">Sin fecha</text>
+  </g>
+  <g transform="translate(1240,180)">
+    <circle cx="0" cy="100" r="14" fill="#FFFFFF" stroke="#CDD5E2" stroke-width="2"/>
+    <rect x="-90" y="0" width="180" height="80" rx="12" fill="#FFFFFF" stroke="#E4E9F2" stroke-dasharray="4 4"/>
+    <text x="-78" y="22" fill="#5A6478" font-size="12" font-weight="700" letter-spacing="1">V5 · QUIZÁ</text>
+    <text x="-78" y="44" fill="#0F1A2B" font-size="14" font-weight="700">Backend HTTP</text>
+    <text x="-78" y="66" fill="#5A6478" font-size="11">Solo si hay 5+ usuarios reales.</text>
+    <text x="-22" y="170" fill="#5A6478" font-size="11" font-family="ui-monospace, Consolas, monospace">Sin fecha</text>
+  </g>
+  <g transform="translate(80,440)">
+    <rect width="1040" height="220" rx="16" fill="#F1F4F8"/>
+    <text x="32" y="40" fill="#0F1A2B" font-size="18" font-weight="700">Comandos del ciclo de vida</text>
+    <g transform="translate(32,68)" font-family="ui-monospace, Consolas, monospace" font-size="13">
+      <g>
+        <rect width="320" height="40" rx="8" fill="#FFFFFF" stroke="#E4E9F2"/>
+        <text x="14" y="26" fill="#3D7BD9">npm install</text>
+        <text x="350" y="26" fill="#5A6478" font-family="-apple-system, Segoe UI, Inter, sans-serif">→ instala Electron y electron-builder</text>
+      </g>
+      <g transform="translate(0,52)">
+        <rect width="320" height="40" rx="8" fill="#FFFFFF" stroke="#E4E9F2"/>
+        <text x="14" y="26" fill="#3D7BD9">npm run dev</text>
+        <text x="350" y="26" fill="#5A6478" font-family="-apple-system, Segoe UI, Inter, sans-serif">→ abre la app en modo desarrollo</text>
+      </g>
+      <g transform="translate(0,104)">
+        <rect width="320" height="40" rx="8" fill="#FFFFFF" stroke="#E4E9F2"/>
+        <text x="14" y="26" fill="#3D7BD9">npm run build:win</text>
+        <text x="350" y="26" fill="#5A6478" font-family="-apple-system, Segoe UI, Inter, sans-serif">→ genera dist/PackPrice-2.0.0-preview-preliminar.exe</text>
+      </g>
+    </g>
+  </g>
+</svg>

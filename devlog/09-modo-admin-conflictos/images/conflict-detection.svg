@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" font-family="-apple-system, Segoe UI, Inter, sans-serif">
+  <rect width="1200" height="760" fill="#F1F4F8"/>
+  <g transform="translate(80,60)">
+    <text fill="#5A6478" font-size="13" font-weight="700" letter-spacing="2">CAPÍTULO 09 · MODO ADMIN</text>
+    <text y="50" fill="#0F1A2B" font-size="32" font-weight="700">Detección de conflictos por hash.</text>
+    <text y="82" fill="#5A6478" font-size="16">Dos personas editando el mismo config.js. Comparamos antes de pisar.</text>
+  </g>
+  <g transform="translate(80,200)" font-family="ui-monospace, Consolas, monospace">
+    <g transform="translate(0,0)">
+      <text fill="#5A6478" font-size="12" font-weight="700" letter-spacing="1.5" font-family="-apple-system, Segoe UI, Inter, sans-serif">ALBERTO · PC1</text>
+    </g>
+    <g transform="translate(440,0)">
+      <text fill="#5A6478" font-size="12" font-weight="700" letter-spacing="1.5" font-family="-apple-system, Segoe UI, Inter, sans-serif">CONFIG.JS · NAS</text>
+    </g>
+    <g transform="translate(840,0)">
+      <text fill="#5A6478" font-size="12" font-weight="700" letter-spacing="1.5" font-family="-apple-system, Segoe UI, Inter, sans-serif">FEDE · PC2</text>
+    </g>
+    <g transform="translate(0,30)">
+      <rect width="320" height="80" rx="12" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <text x="20" y="32" fill="#0F1A2B" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">1 · Abrir modo admin</text>
+      <text x="20" y="58" fill="#5A6478" font-size="12" font-family="-apple-system, Segoe UI, Inter, sans-serif">Guarda mtime + sha256 al abrir.</text>
+    </g>
+    <line x1="320" y1="70" x2="440" y2="70" stroke="#5A6478" stroke-dasharray="4 4"/>
+    <text x="346" y="62" fill="#5A6478" font-size="11" font-family="-apple-system, Segoe UI, Inter, sans-serif">leer</text>
+    <g transform="translate(440,30)">
+      <rect width="320" height="80" rx="12" fill="#0F1A2B"/>
+      <text x="20" y="32" fill="#FFFFFF" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">v1.0 · hash A1B2C3...</text>
+      <text x="20" y="58" fill="#A6B0C2" font-size="12" font-family="-apple-system, Segoe UI, Inter, sans-serif">mtime 28/4 10:00:00</text>
+    </g>
+    <g transform="translate(840,30)">
+      <rect width="240" height="80" rx="12" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <text x="20" y="32" fill="#5A6478" font-size="12" font-family="-apple-system, Segoe UI, Inter, sans-serif">…ocupado en otra cosa</text>
+    </g>
+    <g transform="translate(0,140)">
+      <rect width="320" height="80" rx="12" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <text x="20" y="32" fill="#0F1A2B" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">2 · Edita el IVA al 21,5%</text>
+      <text x="20" y="58" fill="#5A6478" font-size="12" font-family="-apple-system, Segoe UI, Inter, sans-serif">Sin guardar todavía.</text>
+    </g>
+    <g transform="translate(840,140)">
+      <rect width="240" height="80" rx="12" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <text x="20" y="32" fill="#0F1A2B" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">2' · Edita PVP T2</text>
+      <text x="20" y="58" fill="#5A6478" font-size="12" font-family="-apple-system, Segoe UI, Inter, sans-serif">y guarda primero.</text>
+    </g>
+    <line x1="840" y1="180" x2="760" y2="180" stroke="#5A6478"/>
+    <text x="780" y="172" fill="#5A6478" font-size="11" font-family="-apple-system, Segoe UI, Inter, sans-serif">escribe</text>
+    <g transform="translate(440,140)">
+      <rect width="320" height="80" rx="12" fill="#0F1A2B"/>
+      <text x="20" y="32" fill="#FFFFFF" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">v1.1 · hash D4E5F6...</text>
+      <text x="20" y="58" fill="#A6B0C2" font-size="12" font-family="-apple-system, Segoe UI, Inter, sans-serif">mtime 28/4 10:18:33 · backup #146</text>
+    </g>
+    <g transform="translate(0,250)">
+      <rect width="320" height="80" rx="12" fill="#FBE6E6"/>
+      <text x="20" y="32" fill="#D24D4D" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">3 · Pulsa Guardar en NAS</text>
+      <text x="20" y="58" fill="#D24D4D" font-size="12" font-family="-apple-system, Segoe UI, Inter, sans-serif">Re-lee el archivo, recalcula hash.</text>
+    </g>
+    <line x1="320" y1="290" x2="440" y2="290" stroke="#D24D4D" stroke-dasharray="4 4"/>
+    <text x="340" y="282" fill="#D24D4D" font-size="11" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">comparar</text>
+    <g transform="translate(440,250)">
+      <rect width="320" height="80" rx="12" fill="#0F1A2B" stroke="#D24D4D" stroke-width="2"/>
+      <text x="20" y="32" fill="#FFFFFF" font-size="13" font-weight="700" font-family="-apple-system, Segoe UI, Inter, sans-serif">A1B2C3 ≠ D4E5F6</text>
+      <text x="20" y="58" fill="#D24D4D" font-size="12" font-family="-apple-system, Segoe UI, Inter, sans-serif">¡Conflicto detectado!</text>
+    </g>
+  </g>
+  <g transform="translate(80,580)">
+    <rect width="1040" height="140" rx="16" fill="#FFFFFF" stroke="#E4E9F2"/>
+    <g transform="translate(28,28)">
+      <rect width="48" height="48" rx="10" fill="#FBEFD9"/>
+      <text x="14" y="32" fill="#D98A1F" font-size="22">⚠</text>
+    </g>
+    <text x="92" y="44" fill="#0F1A2B" font-size="16" font-weight="700">Diálogo nativo Windows</text>
+    <text x="92" y="68" fill="#5A6478" font-size="13">«El archivo fue modificado por Fede mientras editabas. ¿Qué hacer?»</text>
+    <g transform="translate(92,90)">
+      <rect width="160" height="36" rx="10" fill="#3D7BD9"/>
+      <text x="22" y="24" fill="#FFFFFF" font-size="13" font-weight="700">Sobrescribir</text>
+    </g>
+    <g transform="translate(266,90)">
+      <rect width="180" height="36" rx="10" fill="#FFFFFF" stroke="#CDD5E2"/>
+      <text x="22" y="24" fill="#0F1A2B" font-size="13" font-weight="600">Descartar mis cambios</text>
+    </g>
+    <g transform="translate(458,90)">
+      <rect width="120" height="36" rx="10" fill="#F1F4F8"/>
+      <text x="36" y="24" fill="#5A6478" font-size="13" font-weight="600">Cancelar</text>
+    </g>
+    <text x="592" y="112" fill="#5A6478" font-size="12">El backup se crea siempre. Decisión es reversible.</text>
+  </g>
+</svg>

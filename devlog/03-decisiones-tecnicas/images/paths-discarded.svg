@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" font-family="-apple-system, Segoe UI, Inter, sans-serif">
+  <rect width="1200" height="700" fill="#F1F4F8"/>
+  <g transform="translate(80,60)">
+    <text fill="#5A6478" font-size="13" font-weight="700" letter-spacing="2">CAPÍTULO 03 · ARQUITECTURA</text>
+    <text y="50" fill="#0F1A2B" font-size="36" font-weight="700">Cinco caminos descartados.</text>
+    <text y="84" fill="#5A6478" font-size="16">Antes de elegir Electron, había que ver cómo morían las alternativas.</text>
+  </g>
+  <g transform="translate(80,200)" font-family="-apple-system, Segoe UI, Inter, sans-serif">
+    <g transform="translate(0,0)">
+      <rect width="500" height="100" rx="14" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <rect width="6" height="100" rx="3" fill="#D24D4D"/>
+      <text x="28" y="36" fill="#0F1A2B" font-size="16" font-weight="700">SQLite directamente sobre el NAS</text>
+      <text x="28" y="62" fill="#5A6478" font-size="13">La propia documentación de SQLite avisa: escritura concurrente</text>
+      <text x="28" y="80" fill="#5A6478" font-size="13">sobre SMB → corrupción del archivo. Bloqueante.</text>
+    </g>
+    <g transform="translate(540,0)">
+      <rect width="500" height="100" rx="14" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <rect width="6" height="100" rx="3" fill="#D24D4D"/>
+      <text x="28" y="36" fill="#0F1A2B" font-size="16" font-weight="700">Backend Node por PC con SQLite remoto</text>
+      <text x="28" y="62" fill="#5A6478" font-size="13">Mismo problema con SMB y, encima, sin servidor central</text>
+      <text x="28" y="80" fill="#5A6478" font-size="13">no hay un punto de coordinación que evite las races.</text>
+    </g>
+    <g transform="translate(0,120)">
+      <rect width="500" height="100" rx="14" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <rect width="6" height="100" rx="3" fill="#D24D4D"/>
+      <text x="28" y="36" fill="#0F1A2B" font-size="16" font-weight="700">Servidor Node + HTTP en un PC del taller</text>
+      <text x="28" y="62" fill="#5A6478" font-size="13">El "servidor" disponible es un NAS de archivos puro: no</text>
+      <text x="28" y="80" fill="#5A6478" font-size="13">ejecuta procesos. Habría que dedicar un PC siempre encendido.</text>
+    </g>
+    <g transform="translate(540,120)">
+      <rect width="500" height="100" rx="14" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <rect width="6" height="100" rx="3" fill="#D24D4D"/>
+      <text x="28" y="36" fill="#0F1A2B" font-size="16" font-weight="700">Web app file:// con config configurable</text>
+      <text x="28" y="62" fill="#5A6478" font-size="13">El navegador no permite leer/escribir rutas arbitrarias del</text>
+      <text x="28" y="80" fill="#5A6478" font-size="13">filesystem ni recordar handles. Selección manual cada vez.</text>
+    </g>
+    <g transform="translate(270,240)">
+      <rect width="500" height="120" rx="14" fill="#0F1A2B"/>
+      <rect width="6" height="120" rx="3" fill="#1FA86A"/>
+      <text x="28" y="36" fill="#FFFFFF" font-size="18" font-weight="700">✓ Electron + config.js plano en el NAS</text>
+      <text x="28" y="64" fill="#A6B0C2" font-size="13">Electron es Node + Chromium, lectura/escritura libre del</text>
+      <text x="28" y="84" fill="#A6B0C2" font-size="13">NAS. JS plano como almacén — versionable, legible, restaurable</text>
+      <text x="28" y="104" fill="#A6B0C2" font-size="13">a mano. Cero infraestructura adicional.</text>
+    </g>
+  </g>
+</svg>

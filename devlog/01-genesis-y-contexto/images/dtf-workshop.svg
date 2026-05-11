@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" font-family="-apple-system, Segoe UI, Inter, sans-serif">
+  <rect width="1200" height="600" fill="#F1F4F8"/>
+  <g transform="translate(80,80)">
+    <text fill="#5A6478" font-size="13" font-weight="700" letter-spacing="2">CAPÍTULO 01 · GÉNESIS</text>
+    <text y="60" fill="#0F1A2B" font-size="44" font-weight="700" letter-spacing="-0.5">Una calculadora para el taller.</text>
+    <text y="100" fill="#5A6478" font-size="20">Guadalajara, España. Más de 25 años imprimiendo DTF.</text>
+  </g>
+  <g transform="translate(80,260)">
+    <rect width="320" height="240" rx="16" fill="#FFFFFF" stroke="#E4E9F2"/>
+    <g transform="translate(28,28)">
+      <rect width="48" height="48" rx="10" fill="#E4EEFC"/>
+      <text x="14" y="32" fill="#1F4FA3" font-size="22" font-weight="700">12</text>
+    </g>
+    <text x="28" y="120" fill="#0F1A2B" font-size="18" font-weight="600">Pedido típico</text>
+    <text x="28" y="146" fill="#5A6478" font-size="14">Pack peña: camiseta + sudadera</text>
+    <text x="28" y="170" fill="#5A6478" font-size="14">por persona, estampado a 2 caras.</text>
+    <text x="28" y="200" fill="#5A6478" font-size="14">Mínimo 10 unidades.</text>
+  </g>
+  <g transform="translate(440,260)">
+    <rect width="320" height="240" rx="16" fill="#FFFFFF" stroke="#E4E9F2"/>
+    <g transform="translate(28,28)">
+      <rect width="48" height="48" rx="10" fill="#FBEFD9"/>
+      <text x="14" y="32" fill="#D98A1F" font-size="22" font-weight="700">⚠</text>
+    </g>
+    <text x="28" y="120" fill="#0F1A2B" font-size="18" font-weight="600">El problema</text>
+    <text x="28" y="146" fill="#5A6478" font-size="14">Una hoja Excel desactualizada,</text>
+    <text x="28" y="170" fill="#5A6478" font-size="14">un bug del buffer 3XL repartido</text>
+    <text x="28" y="194" fill="#5A6478" font-size="14">en cada prenda en vez de cada</text>
+    <text x="28" y="218" fill="#5A6478" font-size="14">pack. Márgenes opacos.</text>
+  </g>
+  <g transform="translate(800,260)">
+    <rect width="320" height="240" rx="16" fill="#0F1A2B"/>
+    <g transform="translate(28,28)">
+      <rect width="48" height="48" rx="10" fill="#3D7BD9"/>
+      <text x="13" y="32" fill="#FFFFFF" font-size="20" font-weight="700">→</text>
+    </g>
+    <text x="28" y="120" fill="#FFFFFF" font-size="18" font-weight="600">El objetivo</text>
+    <text x="28" y="146" fill="#A6B0C2" font-size="14">Una app interna, rápida,</text>
+    <text x="28" y="170" fill="#A6B0C2" font-size="14">predecible, que dé el precio</text>
+    <text x="28" y="194" fill="#A6B0C2" font-size="14">al cliente y deje ver el margen</text>
+    <text x="28" y="218" fill="#A6B0C2" font-size="14">al taller, sin pelearse con Excel.</text>
+  </g>
+</svg>

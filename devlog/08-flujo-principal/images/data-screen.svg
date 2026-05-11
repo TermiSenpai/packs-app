@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 880" font-family="-apple-system, Segoe UI, Inter, sans-serif">
+  <rect width="1280" height="880" fill="#F1F4F8"/>
+  <g transform="translate(40,40)">
+    <rect width="1200" height="800" rx="20" fill="#FFFFFF"/>
+    <g transform="translate(48,48)">
+      <text fill="#5A6478" font-size="13">← Cambiar pack</text>
+      <text x="1100" fill="#5A6478" font-size="11" font-weight="700" letter-spacing="1.5">PASO 2 DE 3</text>
+    </g>
+    <g transform="translate(48,90)">
+      <text fill="#0F1A2B" font-size="28" font-weight="700">Pack peña completa</text>
+      <text y="32" fill="#5A6478" font-size="14">Configura cantidad, modelo de sudadera y caras estampadas. La columna lateral va calculando en vivo.</text>
+    </g>
+    <g transform="translate(48,180)">
+      <rect width="720" height="320" rx="16" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <text x="32" y="40" fill="#0F1A2B" font-size="16" font-weight="700">Datos del pedido</text>
+      <g transform="translate(32,68)">
+        <text fill="#5A6478" font-size="12" font-weight="600">CANTIDAD DE PACKS</text>
+        <g transform="translate(0,16)">
+          <rect width="40" height="40" rx="10" fill="#FFFFFF" stroke="#CDD5E2"/>
+          <text x="14" y="26" fill="#0F1A2B" font-size="18" font-weight="700">−</text>
+          <rect x="48" width="80" height="40" rx="10" fill="#FFFFFF" stroke="#CDD5E2"/>
+          <text x="74" y="26" fill="#0F1A2B" font-size="18" font-weight="700" font-family="ui-monospace, Consolas, monospace" text-anchor="middle">12</text>
+          <rect x="136" width="40" height="40" rx="10" fill="#FFFFFF" stroke="#CDD5E2"/>
+          <text x="148" y="26" fill="#0F1A2B" font-size="18" font-weight="700">+</text>
+        </g>
+      </g>
+      <g transform="translate(32,160)">
+        <text fill="#5A6478" font-size="12" font-weight="600">CARAS ESTAMPADAS</text>
+        <g transform="translate(0,18)">
+          <rect width="200" height="60" rx="12" fill="#3D7BD9"/>
+          <text x="20" y="26" fill="#FFFFFF" font-size="14" font-weight="700">2 caras</text>
+          <text x="20" y="46" fill="#FFFFFF" font-size="12" opacity="0.85">Frente y espalda</text>
+          <rect x="216" width="200" height="60" rx="12" fill="#FFFFFF" stroke="#CDD5E2"/>
+          <text x="236" y="26" fill="#0F1A2B" font-size="14" font-weight="700">1 cara</text>
+          <text x="236" y="46" fill="#5A6478" font-size="12">Solo frente · −3 €</text>
+        </g>
+      </g>
+      <g transform="translate(32,260)">
+        <text fill="#5A6478" font-size="12" font-weight="600">MODELO DE SUDADERA</text>
+        <g transform="translate(0,18)">
+          <rect width="160" height="40" rx="10" fill="#FFFFFF" stroke="#3D7BD9" stroke-width="2"/>
+          <text x="14" y="26" fill="#0F1A2B" font-size="13" font-weight="700">CLASICA · sin capucha</text>
+          <rect x="172" width="160" height="40" rx="10" fill="#FFFFFF" stroke="#CDD5E2"/>
+          <text x="186" y="26" fill="#5A6478" font-size="13">URBAN · con capucha</text>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(48,520)">
+      <rect width="720" height="180" rx="16" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <text x="32" y="40" fill="#0F1A2B" font-size="16" font-weight="700">Tallas grandes</text>
+      <g transform="translate(560,30)">
+        <rect width="140" height="26" rx="13" fill="#FBEFD9"/>
+        <text x="14" y="18" fill="#D98A1F" font-size="11" font-weight="600">Recargo al cliente</text>
+      </g>
+      <g transform="translate(32,76)">
+        <text fill="#5A6478" font-size="12" font-weight="600">4XL · +3 €/prenda</text>
+        <g transform="translate(0,16)">
+          <rect width="36" height="36" rx="10" fill="#FFFFFF" stroke="#CDD5E2"/>
+          <text x="14" y="24" fill="#0F1A2B" font-size="14">−</text>
+          <rect x="44" width="60" height="36" rx="10" fill="#FFFFFF" stroke="#CDD5E2"/>
+          <text x="74" y="24" fill="#0F1A2B" font-size="14" font-weight="700" font-family="ui-monospace, Consolas, monospace" text-anchor="middle">2</text>
+          <rect x="112" width="36" height="36" rx="10" fill="#FFFFFF" stroke="#CDD5E2"/>
+          <text x="124" y="24" fill="#0F1A2B" font-size="14">+</text>
+        </g>
+      </g>
+      <g transform="translate(228,76)">
+        <text fill="#5A6478" font-size="12" font-weight="600">5XL+ · +5 €/prenda</text>
+        <g transform="translate(0,16)">
+          <rect width="36" height="36" rx="10" fill="#FFFFFF" stroke="#CDD5E2"/>
+          <text x="14" y="24" fill="#0F1A2B" font-size="14">−</text>
+          <rect x="44" width="60" height="36" rx="10" fill="#FFFFFF" stroke="#CDD5E2"/>
+          <text x="74" y="24" fill="#0F1A2B" font-size="14" font-weight="700" font-family="ui-monospace, Consolas, monospace" text-anchor="middle">0</text>
+          <rect x="112" width="36" height="36" rx="10" fill="#FFFFFF" stroke="#CDD5E2"/>
+          <text x="124" y="24" fill="#0F1A2B" font-size="14">+</text>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(48,720)">
+      <rect width="120" height="44" rx="12" fill="#F1F4F8"/>
+      <text x="32" y="28" fill="#5A6478" font-size="13" font-weight="600">Reiniciar</text>
+      <g transform="translate(560,0)">
+        <rect width="160" height="44" rx="12" fill="#3D7BD9"/>
+        <text x="22" y="28" fill="#FFFFFF" font-size="14" font-weight="700">Calcular precio →</text>
+      </g>
+    </g>
+    <g transform="translate(792,180)">
+      <rect width="360" height="320" rx="16" fill="#0F1A2B"/>
+      <g transform="translate(28,28)">
+        <rect width="160" height="26" rx="13" fill="#1A2740"/>
+        <text x="14" y="18" fill="#A6B0C2" font-size="11" font-weight="700" letter-spacing="1">VISTA PREVIA EN VIVO</text>
+      </g>
+      <g transform="translate(232,28)">
+        <rect width="100" height="26" rx="13" fill="#3D7BD9"/>
+        <text x="32" y="18" fill="#FFFFFF" font-size="11" font-weight="700">Tramo T1</text>
+      </g>
+      <text x="28" y="148" fill="#FFFFFF" font-size="48" font-weight="700" font-family="ui-monospace, Consolas, monospace">311,40 €</text>
+      <text x="28" y="174" fill="#A6B0C2" font-size="13">12 packs · 25,95 € por pack</text>
+      <line x1="28" x2="332" y1="200" y2="200" stroke="#1A2740"/>
+      <g transform="translate(28,224)" font-family="ui-monospace, Consolas, monospace" font-size="13">
+        <text fill="#A6B0C2" font-family="-apple-system, Segoe UI, Inter, sans-serif" font-size="13">Camisetas</text>
+        <text x="304" fill="#FFFFFF" text-anchor="end">119,40 €</text>
+      </g>
+      <g transform="translate(28,250)" font-family="ui-monospace, Consolas, monospace" font-size="13">
+        <text fill="#A6B0C2" font-family="-apple-system, Segoe UI, Inter, sans-serif" font-size="13">Sudaderas</text>
+        <text x="304" fill="#FFFFFF" text-anchor="end">192,00 €</text>
+      </g>
+      <g transform="translate(28,276)" font-family="ui-monospace, Consolas, monospace" font-size="13">
+        <text fill="#A6B0C2" font-family="-apple-system, Segoe UI, Inter, sans-serif" font-size="13">Recargos 4XL</text>
+        <text x="304" fill="#FFFFFF" text-anchor="end">+ 6,00 €</text>
+      </g>
+      <g transform="translate(28,302)" font-family="ui-monospace, Consolas, monospace" font-size="13">
+        <text fill="#A6B0C2" font-family="-apple-system, Segoe UI, Inter, sans-serif" font-size="13">IVA 21%</text>
+        <text x="304" fill="#FFFFFF" text-anchor="end">incluido</text>
+      </g>
+    </g>
+    <g transform="translate(792,520)">
+      <rect width="360" height="180" rx="16" fill="#FFFFFF" stroke="#E4E9F2"/>
+      <text x="28" y="36" fill="#0F1A2B" font-size="14" font-weight="700">Volumen y siguiente tramo</text>
+      <g transform="translate(28,60)">
+        <rect width="304" height="10" rx="5" fill="#E4E9F2"/>
+        <rect width="76" height="10" rx="5" fill="#3D7BD9"/>
+      </g>
+      <g transform="translate(28,86)" font-size="11" fill="#5A6478">
+        <text>10</text>
+        <text x="76">25</text>
+        <text x="152">50</text>
+        <text x="228">100+</text>
+      </g>
+      <text x="28" y="138" fill="#1FA86A" font-size="13" font-weight="700">+13 packs y baja a 24,95 €</text>
+      <text x="28" y="158" fill="#5A6478" font-size="12">Si llegas a 25 packs ahorras 12 €.</text>
+    </g>
+  </g>
+</svg>

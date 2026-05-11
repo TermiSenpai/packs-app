@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" font-family="-apple-system, Segoe UI, Inter, sans-serif">
+  <rect width="1280" height="800" fill="#F1F4F8"/>
+  <g transform="translate(40,40)">
+    <rect width="1200" height="720" rx="20" fill="#FFFFFF"/>
+    <g transform="translate(0,0)">
+      <rect width="560" height="720" rx="20" fill="#0F1A2B"/>
+      <rect x="80" y="80" width="40" height="40" rx="10" fill="#3D7BD9"/>
+      <text x="92" y="108" fill="#FFFFFF" font-size="22" font-weight="700">P</text>
+      <text x="138" y="106" fill="#FFFFFF" font-size="18" font-weight="600">PackPrice</text>
+      <g transform="translate(80,260)">
+        <rect width="140" height="28" rx="14" fill="#1A2740"/>
+        <text x="20" y="19" fill="#A6B0C2" font-size="12" font-weight="600">PRIMER ARRANQUE</text>
+      </g>
+      <text x="80" y="346" fill="#FFFFFF" font-size="42" font-weight="700">Calcula precios de</text>
+      <text x="80" y="394" fill="#FFFFFF" font-size="42" font-weight="700">packs DTF en</text>
+      <text x="80" y="442" fill="#FFFFFF" font-size="42" font-weight="700">segundos.</text>
+      <text x="80" y="486" fill="#A6B0C2" font-size="15">Configuración compartida desde tu NAS, sin cuentas,</text>
+      <text x="80" y="508" fill="#A6B0C2" font-size="15">sin servidor, sin internet.</text>
+      <g transform="translate(80,580)">
+        <text fill="#FFFFFF" font-size="28" font-weight="700">5</text>
+        <text y="22" fill="#A6B0C2" font-size="12">Tipos de pack</text>
+      </g>
+      <g transform="translate(180,580)">
+        <text fill="#FFFFFF" font-size="28" font-weight="700">3</text>
+        <text y="22" fill="#A6B0C2" font-size="12">Modelos Roly</text>
+      </g>
+      <g transform="translate(280,580)">
+        <text fill="#FFFFFF" font-size="28" font-weight="700">4</text>
+        <text y="22" fill="#A6B0C2" font-size="12">Tramos por volumen</text>
+      </g>
+    </g>
+    <g transform="translate(560,0)">
+      <text x="80" y="120" fill="#0F1A2B" font-size="32" font-weight="700">Empezar</text>
+      <text x="80" y="156" fill="#5A6478" font-size="15">Indica tu nombre y la ruta del config.js en el NAS.</text>
+      <g transform="translate(80,200)">
+        <text fill="#5A6478" font-size="12" font-weight="600">TU NOMBRE</text>
+        <rect y="14" width="480" height="48" rx="12" fill="#FFFFFF" stroke="#CDD5E2"/>
+        <text x="16" y="44" fill="#0F1A2B" font-size="15">Alberto</text>
+      </g>
+      <g transform="translate(80,300)">
+        <text fill="#5A6478" font-size="12" font-weight="600">ARCHIVO DE CONFIGURACIÓN</text>
+        <rect y="14" width="370" height="48" rx="12" fill="#FFFFFF" stroke="#CDD5E2"/>
+        <text x="16" y="44" fill="#5A6478" font-size="13" font-family="ui-monospace, Consolas, monospace">\\172.26.0.154\Paep\...</text>
+        <rect x="380" y="14" width="100" height="48" rx="12" fill="#FFFFFF" stroke="#CDD5E2"/>
+        <text x="400" y="44" fill="#0F1A2B" font-size="14" font-weight="600">Explorar</text>
+      </g>
+      <g transform="translate(80,400)">
+        <rect width="480" height="56" rx="12" fill="#E4EEFC"/>
+        <text x="20" y="24" fill="#1F4FA3" font-size="13" font-weight="600">Si el archivo no existe, PackPrice puede crearlo</text>
+        <text x="20" y="44" fill="#1F4FA3" font-size="12">con valores por defecto al guardar la primera vez.</text>
+      </g>
+      <g transform="translate(80,640)">
+        <text fill="#5A6478" font-size="12">¿Necesitas ayuda? Contacta con tu administrador</text>
+        <g transform="translate(330,-12)">
+          <rect width="150" height="44" rx="12" fill="#3D7BD9"/>
+          <text x="36" y="28" fill="#FFFFFF" font-size="14" font-weight="600">Empezar →</text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
