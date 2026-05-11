@@ -16,6 +16,7 @@ import {
   calcularPackPena,
   calcularPackIndividual,
   calcularPackMixto,
+  calcularPackPersonalizado,
   getTramo
 } from './calculo.js';
 import {
@@ -37,7 +38,8 @@ let ultimoResultado = null;         // útil para "Copiar resumen"
 const estado = {
   packId: null,
   esAdmin: false,
-  adminTab: 'parametros'
+  adminTab: 'parametros',
+  mostrarCostes: false      // atajo secreto: 3 × "." alterna la vista
 };
 
 // ============================================================
@@ -65,6 +67,10 @@ const PACK_META = {
   sudaderas_mixto: {
     icon: 'i-layers',
     desc: 'CLASICA + URBAN combinadas en el mismo pedido.'
+  },
+  personalizado: {
+    icon: 'i-plus',
+    desc: 'Combina manualmente cualquier cantidad de cada modelo Roly.'
   }
 };
 
@@ -199,10 +205,38 @@ async function cargarConfigYMostrarApp() {
   }
 
   CFG = r.config;
+  garantizarPacksPorDefecto(CFG);
   hide('pantalla-bienvenida');
   hide('pantalla-error');
   show('pantalla-app');
   inicializarApp();
+}
+
+/**
+ * Asegura que el config en memoria tiene los packs y parámetros
+ * introducidos en versiones posteriores al archivo del NAS. Solo añade
+ * campos que faltan con defaults seguros; no toca el archivo hasta que
+ * un admin guarde.
+ */
+function garantizarPacksPorDefecto(cfg) {
+  if (!cfg.packs) cfg.packs = {};
+  if (!cfg.packs.personalizado) {
+    cfg.packs.personalizado = {
+      tipo: 'personalizado',
+      nombre: 'Pack personalizado',
+      min_total: 10,
+      modelos_referencia: {
+        BEAGLE:  'solo_camisetas',
+        CLASICA: 'solo_clasica',
+        URBAN:   'solo_urban'
+      }
+    };
+  }
+
+  if (!cfg.parametros) cfg.parametros = {};
+  if (cfg.parametros.extra_nombre_eur      === undefined) cfg.parametros.extra_nombre_eur      = 1.5;
+  if (cfg.parametros.extra_manga_corta_eur === undefined) cfg.parametros.extra_manga_corta_eur = 1.5;
+  if (cfg.parametros.extra_manga_larga_eur === undefined) cfg.parametros.extra_manga_larga_eur = 3;
 }
 
 async function mostrarPantallaError(detalle) {
@@ -266,9 +300,6 @@ function inicializarApp() {
   el('info-usuario').textContent = SETTINGS.nombre_usuario;
   el('info-fecha-cfg').textContent = abreviarFechaCfg(CFG.fecha_actualizacion);
   el('cfg-version').textContent = CFG.version || '?';
-  const versionFoot = el('cfg-version-foot');
-  if (versionFoot) versionFoot.textContent = CFG.version || '?';
-  el('cfg-modificado-por').textContent = CFG.modificado_por || '-';
 
   // Sustituir spans con valores de config
   document.querySelectorAll('[data-cfg]').forEach(span => {
@@ -374,6 +405,54 @@ function bindearEventos() {
       a.blur();
     }
   }, { passive: true });
+
+  bindearAtajoSecretoCostes();
+}
+
+/**
+ * Atajo secreto: 3 pulsaciones de "." (numpad o no) en menos de 800 ms
+ * alternan la visualización de costes y márgenes en el resultado. Útil
+ * para ocultar datos internos cuando el cliente está mirando la pantalla.
+ *
+ * Se ignora si el foco está en un input/textarea/select para no romper
+ * la introducción de decimales (numpad "." o coma decimal).
+ */
+function bindearAtajoSecretoCostes() {
+  const VENTANA_MS = 800;
+  let pulsaciones = 0;
+  let timer = null;
+
+  const reset = () => {
+    pulsaciones = 0;
+    if (timer) { clearTimeout(timer); timer = null; }
+  };
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== '.') {
+      // Cualquier otra tecla rompe la cadena.
+      if (pulsaciones > 0) reset();
+      return;
+    }
+
+    const t = e.target;
+    const enCampo = t instanceof HTMLElement
+      && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName);
+    if (enCampo) return;
+
+    pulsaciones++;
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(reset, VENTANA_MS);
+
+    if (pulsaciones >= 3) {
+      reset();
+      estado.mostrarCostes = !estado.mostrarCostes;
+      // Re-render solo si la pantalla del resultado está visible.
+      const resultadoVisible = !el('seccion-resultado').classList.contains('hidden');
+      if (resultadoVisible && ultimoResultado) {
+        renderResultado(ultimoResultado);
+      }
+    }
+  });
 }
 
 // ============================================================
@@ -429,6 +508,16 @@ function calcularDesde(pack) {
   if (pack.tipo === 'mixto' && pack.packs_referencia) {
     const refClasica = CFG.packs[pack.packs_referencia.CLASICA];
     if (refClasica) return calcularDesde(refClasica);
+  }
+  if (pack.tipo === 'personalizado' && pack.modelos_referencia) {
+    // El más barato de las referencias en T1 con 2 caras: orienta al usuario.
+    let min = null;
+    for (const refId of Object.values(pack.modelos_referencia)) {
+      const ref = CFG.packs[refId];
+      const v = ref ? calcularDesde(ref) : null;
+      if (v !== null && (min === null || v < min)) min = v;
+    }
+    return min;
   }
   return null;
 }
@@ -562,10 +651,102 @@ function renderInputsPack(packId) {
         <span class="field__hint">Total mínimo: ${pack.min_total} sudaderas. Cada sudadera factura a su PVP según el tramo del total.</span>
       </div>
     `;
+  } else if (pack.tipo === 'personalizado') {
+    const modelosDisponibles = Object.keys(pack.modelos_referencia || {});
+    container.innerHTML = `
+      <div id="lineas-personalizado" class="lineas-personalizado"></div>
+      <div class="lineas-personalizado__add">
+        <button id="btn-anadir-linea" type="button" class="btn btn-secondary">
+          <svg class="icon"><use href="#i-plus"/></svg> Añadir línea
+        </button>
+        <span class="field__hint">
+          Mín. ${pack.min_total} prendas en total. Cada línea factura al PVP del pack individual del modelo, según el tramo del total.
+        </span>
+      </div>
+    `;
+    // Línea inicial con el primer modelo disponible
+    const cont = el('lineas-personalizado');
+    cont.appendChild(crearLineaPersonalizado(modelosDisponibles, modelosDisponibles[0], 1, 2));
+
+    el('btn-anadir-linea').addEventListener('click', () => {
+      const idx = cont.children.length;
+      cont.appendChild(crearLineaPersonalizado(modelosDisponibles, modelosDisponibles[0], 1, 2, idx));
+      recalcularPreview();
+    });
+
+    cont.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-accion-linea="eliminar"]');
+      if (!btn) return;
+      const linea = btn.closest('.linea-personalizado');
+      if (!linea) return;
+      if (cont.children.length === 1) {
+        // Mantener al menos una línea: limpiamos cantidad en lugar de borrar.
+        const input = linea.querySelector('[data-linea-cantidad]');
+        if (input) input.value = '0';
+        recalcularPreview();
+        return;
+      }
+      linea.remove();
+      reindexarLineasPersonalizado(cont);
+      recalcularPreview();
+    });
   }
 
   // Wire NumberSteps
   container.querySelectorAll('.numstep').forEach(wireNumStep);
+}
+
+/**
+ * Crea una <div.linea-personalizado> con select de modelo, cantidad y caras.
+ * Los radios de caras necesitan un nombre único por línea para que cada
+ * grupo sea independiente.
+ */
+function crearLineaPersonalizado(modelosDisponibles, modeloSel, cantidad, caras, idx = 0) {
+  const wrap = document.createElement('div');
+  wrap.className = 'linea-personalizado';
+  wrap.dataset.idx = String(idx);
+
+  const opciones = modelosDisponibles.map(id => {
+    const m = CFG.modelos_roly[id];
+    const nombre = m ? `${m.nombre} (${id})` : id;
+    return `<option value="${id}" ${id === modeloSel ? 'selected' : ''}>${escapeHTML(nombre)}</option>`;
+  }).join('');
+
+  const carasName = `caras_linea_${idx}_${Math.random().toString(36).slice(2, 7)}`;
+  wrap.innerHTML = `
+    <div class="linea-personalizado__grid">
+      <div class="field">
+        <label class="field__label">Modelo</label>
+        <select class="input" data-linea-modelo>${opciones}</select>
+      </div>
+      <div class="field">
+        <label class="field__label">Cantidad</label>
+        <input type="number" class="input" min="0" step="1" value="${cantidad}" data-linea-cantidad>
+      </div>
+      <div class="field">
+        <span class="field__label">Caras</span>
+        <div class="radio-cards radio-cards--inline">
+          <label class="radio-card">
+            <input type="radio" name="${carasName}" value="1" data-linea-caras ${caras === 1 ? 'checked' : ''}> 1 cara
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="${carasName}" value="2" data-linea-caras ${caras === 2 ? 'checked' : ''}> 2 caras
+          </label>
+        </div>
+      </div>
+      <button type="button" class="linea-personalizado__remove" data-accion-linea="eliminar"
+              aria-label="Eliminar línea" title="Eliminar línea">
+        <svg class="icon"><use href="#i-x"/></svg>
+      </button>
+    </div>
+  `;
+  return wrap;
+}
+
+function reindexarLineasPersonalizado(cont) {
+  Array.from(cont.children).forEach((linea, idx) => {
+    linea.dataset.idx = String(idx);
+  });
 }
 
 function numStep(id, min, value) {
@@ -597,20 +778,25 @@ function recogerInputs() {
   const pack = CFG.packs[estado.packId];
   const cant_4xl = intDe('cant_4xl');
   const cant_5xl = intDe('cant_5xl');
+  const extras = {
+    nombres:        intDe('cant_nombres'),
+    mangas_cortas:  intDe('cant_mangas_cortas'),
+    mangas_largas:  intDe('cant_mangas_largas')
+  };
 
   if (pack.tipo === 'pena') {
     return {
       cantidad: intDe('in_cantidad'),
       capucha: document.querySelector('input[name="capucha"]:checked').value,
       caras: parseInt(document.querySelector('input[name="caras"]:checked').value, 10),
-      cant_4xl, cant_5xl
+      cant_4xl, cant_5xl, extras
     };
   }
   if (pack.tipo === 'individual') {
     return {
       cantidad: intDe('in_cantidad'),
       caras: parseInt(document.querySelector('input[name="caras"]:checked').value, 10),
-      cant_4xl, cant_5xl
+      cant_4xl, cant_5xl, extras
     };
   }
   if (pack.tipo === 'mixto') {
@@ -618,8 +804,19 @@ function recogerInputs() {
       cant_clasica: intDe('in_cant_clasica'),
       cant_urban: intDe('in_cant_urban'),
       caras: parseInt(document.querySelector('input[name="caras"]:checked').value, 10),
-      cant_4xl, cant_5xl
+      cant_4xl, cant_5xl, extras
     };
+  }
+  if (pack.tipo === 'personalizado') {
+    const lineas = [];
+    document.querySelectorAll('.linea-personalizado').forEach(row => {
+      const modelo = row.querySelector('[data-linea-modelo]')?.value || '';
+      const cantidad = parseInt(row.querySelector('[data-linea-cantidad]')?.value, 10) || 0;
+      const carasInput = row.querySelector('input[data-linea-caras]:checked');
+      const caras = carasInput ? parseInt(carasInput.value, 10) : 2;
+      lineas.push({ modelo, cantidad, caras });
+    });
+    return { lineas, cant_4xl, cant_5xl, extras };
   }
   return null;
 }
@@ -667,8 +864,9 @@ function recalcularPreview() {
   elTramo.textContent = `Tramo ${tramoIdDeEtiqueta(r.tramo)}`;
 
   const cantidad = r.es_mixto ? r.cantidad_total : r.cantidad;
+  const unidadLabel = r.es_personalizado ? 'prendas' : 'sudaderas';
   const pvpTexto = r.es_mixto
-    ? `${cantidad} sudaderas`
+    ? `${cantidad} ${unidadLabel}`
     : `${cantidad} × ${fmtEur(r.pvp_unitario)}`;
   elMeta.textContent = pvpTexto;
 
@@ -685,6 +883,14 @@ function recalcularPreview() {
   if (r.recargos > 0) {
     rowsHtml += `<div class="preview__row"><span>Recargo tallas grandes</span><strong>${fmtEur(r.recargos)}</strong></div>`;
   }
+  if (r.extras_sin_iva > 0) {
+    const e = r.extras_detalle || {};
+    const partes = [];
+    if (e.nombres)        partes.push(`${e.nombres} nombre${e.nombres > 1 ? 's' : ''}`);
+    if (e.mangas_cortas)  partes.push(`${e.mangas_cortas} mc`);
+    if (e.mangas_largas)  partes.push(`${e.mangas_largas} ml`);
+    rowsHtml += `<div class="preview__row"><span>Extras (${partes.join(' · ')}) <em style="font-style: normal; opacity: 0.7;">sin IVA</em></span><strong>${fmtEur(r.extras_sin_iva)}</strong></div>`;
+  }
   rowsHtml += `<div class="preview__row"><span>IVA (${fmtPct(CFG.parametros.iva)})</span><strong>${fmtEur(r.iva)}</strong></div>`;
   rowsHtml += `<div class="preview__row preview__row--total"><span>Total</span><strong>${fmtEur(r.total_iva_inc)}</strong></div>`;
   elRows.innerHTML = rowsHtml;
@@ -698,6 +904,10 @@ function recogerInputsSafe() {
     if (!opt) return null;
     if ('cantidad' in opt && (isNaN(opt.cantidad) || opt.cantidad <= 0)) return null;
     if ('cant_clasica' in opt && (opt.cant_clasica + opt.cant_urban) <= 0) return null;
+    if ('lineas' in opt) {
+      const total = (opt.lineas || []).reduce((s, l) => s + (l.cantidad || 0), 0);
+      if (total <= 0) return null;
+    }
     return opt;
   } catch (_) {
     return null;
@@ -706,9 +916,10 @@ function recogerInputsSafe() {
 
 function calcularPackTipo(tipo, opt) {
   try {
-    if (tipo === 'pena')        return calcularPackPena(CFG, opt);
-    if (tipo === 'individual')  return calcularPackIndividual(CFG, estado.packId, opt);
-    if (tipo === 'mixto')       return calcularPackMixto(CFG, opt);
+    if (tipo === 'pena')          return calcularPackPena(CFG, opt);
+    if (tipo === 'individual')    return calcularPackIndividual(CFG, estado.packId, opt);
+    if (tipo === 'mixto')         return calcularPackMixto(CFG, opt);
+    if (tipo === 'personalizado') return calcularPackPersonalizado(CFG, opt);
   } catch (e) {
     return { error: e.message || String(e) };
   }
@@ -717,6 +928,9 @@ function calcularPackTipo(tipo, opt) {
 
 function cantidadTotalDe(pack, opt) {
   if (pack.tipo === 'mixto') return (opt.cant_clasica || 0) + (opt.cant_urban || 0);
+  if (pack.tipo === 'personalizado') {
+    return (opt.lineas || []).reduce((s, l) => s + (l.cantidad || 0), 0);
+  }
   return opt.cantidad || 0;
 }
 
@@ -765,13 +979,10 @@ function ejecutarCalculo() {
   const pack = CFG.packs[estado.packId];
   const opt = recogerInputs();
 
-  let resultado;
-  if (pack.tipo === 'pena')            resultado = calcularPackPena(CFG, opt);
-  else if (pack.tipo === 'individual') resultado = calcularPackIndividual(CFG, estado.packId, opt);
-  else if (pack.tipo === 'mixto')      resultado = calcularPackMixto(CFG, opt);
+  const resultado = calcularPackTipo(pack.tipo, opt);
 
-  if (resultado.error) {
-    el('error-msg').textContent = resultado.error;
+  if (!resultado || resultado.error) {
+    el('error-msg').textContent = (resultado && resultado.error) || 'No se pudo calcular el precio.';
     show('error-msg');
     hide('seccion-resultado');
     return;
@@ -804,16 +1015,25 @@ function renderResultado(r) {
   // Hero stats
   const tiempoTotal = calcularTiempoTotal(r);
   const tiempoFmt = formatearTiempo(tiempoTotal);
-  const margenTexto = estado.esAdmin ? fmtPct(r.margen_pct) : '—';
+  const verCostes = estado.esAdmin || estado.mostrarCostes;
   const pvpPorPack = r.es_mixto
     ? fmtEur(r.subtotal / Math.max(1, r.cantidad_total))
     : fmtEur(r.pvp_unitario);
+  const labelCantidad = r.es_personalizado ? 'Prendas' : 'Packs';
+  const labelPvp = r.es_personalizado ? 'PVP medio' : 'PVP por pack';
   const stats = [
-    { label: 'Packs',          value: cantidad,     mono: true },
-    { label: 'PVP por pack',   value: pvpPorPack,   mono: true },
-    { label: 'Tiempo estimado', value: tiempoFmt,    mono: true },
-    { label: 'Margen bruto',    value: margenTexto,  mono: true, accent: estado.esAdmin && r.margen_pct >= 0.30 }
+    { label: labelCantidad,     value: cantidad,    mono: true },
+    { label: labelPvp,          value: pvpPorPack,  mono: true },
+    { label: 'Tiempo estimado', value: tiempoFmt,   mono: true }
   ];
+  if (verCostes) {
+    stats.push({
+      label: 'Margen bruto',
+      value: fmtPct(r.margen_pct),
+      mono: true,
+      accent: r.margen_pct >= 0.30
+    });
+  }
 
   // Composición por tallas
   const totalPrendas = r.es_mixto ? cantidad : (CFG.packs[estado.packId].tipo === 'pena' ? cantidad * 2 : cantidad);
@@ -937,10 +1157,10 @@ function renderResultado(r) {
         <div class="kv-list">
           ${composicionMeta.map(m => `<div class="kv-list__row"><span>${escapeHTML(m.label)}</span><span>${escapeHTML(m.value)}</span></div>`).join('')}
         </div>
-        ${estado.esAdmin ? `
+        ${verCostes ? `
           <hr class="divider">
           <div>
-            <h4 class="h-card" style="font-size: 13px; margin-bottom: 8px;">Datos internos (admin)</h4>
+            <h4 class="h-card" style="font-size: 13px; margin-bottom: 8px;">Datos internos${estado.esAdmin ? ' (admin)' : ''}</h4>
             <div class="kv-list">
               <div class="kv-list__row"><span>Coste total</span><span class="text-mono">${fmtEur(r.coste_total)}</span></div>
               <div class="kv-list__row"><span>Margen €</span><span class="text-mono">${fmtEur(r.margen)}</span></div>
@@ -959,9 +1179,12 @@ function construirBreakdownRows(r) {
   if (r.es_mixto) {
     for (const d of r.desglose) {
       if (d.cantidad === 0) continue;
+      // En personalizado cada línea trae sus propias caras; en mixto
+      // clásico todas comparten r.caras.
+      const caras = d.caras ?? r.caras;
       rows.push({
         concepto: `${d.nombre}`,
-        detalle: `${d.modelo} · ${r.caras} cara${r.caras > 1 ? 's' : ''} · modelo Roly`,
+        detalle: `${d.modelo} · ${caras} cara${caras > 1 ? 's' : ''} · modelo Roly`,
         unit: d.pvp,
         qty: d.cantidad,
         subtotal: d.subtotal
@@ -991,6 +1214,27 @@ function construirBreakdownRows(r) {
       subtotal: r.recargos
     });
   }
+  if (r.extras_sin_iva > 0) {
+    const e = r.extras_detalle || {};
+    const iva = CFG.parametros.iva || 0;
+    const items = [
+      { k: 'nombres',       label: 'Nombre',        unit: CFG.parametros.extra_nombre_eur,      uniLabel: 'ud'    },
+      { k: 'mangas_cortas', label: 'Manga corta',   unit: CFG.parametros.extra_manga_corta_eur, uniLabel: 'manga' },
+      { k: 'mangas_largas', label: 'Manga larga',   unit: CFG.parametros.extra_manga_larga_eur, uniLabel: 'manga' }
+    ];
+    for (const it of items) {
+      const cant = e[it.k] || 0;
+      if (cant === 0) continue;
+      const unitInc = (it.unit || 0) * (1 + iva);
+      rows.push({
+        concepto: it.label,
+        detalle: `${fmtEur(it.unit || 0)}/${it.uniLabel} sin IVA · extra opcional`,
+        unit: unitInc,
+        qty: cant,
+        subtotal: cant * unitInc
+      });
+    }
+  }
   return rows;
 }
 
@@ -1010,6 +1254,13 @@ function construirComposicionMeta(r) {
   } else if (pack.tipo === 'mixto') {
     meta.push({ label: 'CLASICA / URBAN', value: `${r.desglose[0].cantidad} / ${r.desglose[1].cantidad}` });
     meta.push({ label: 'Caras impresión', value: `${r.caras} cara${r.caras > 1 ? 's' : ''}` });
+  } else if (pack.tipo === 'personalizado') {
+    const lineasResumen = r.desglose
+      .filter(d => d.cantidad > 0)
+      .map(d => `${d.cantidad} × ${d.modelo} (${d.caras}c)`)
+      .join(' · ');
+    meta.push({ label: 'Líneas', value: lineasResumen || '—' });
+    meta.push({ label: 'Total prendas', value: String(r.cantidad_total) });
   }
   meta.push({ label: 'Tallas con recargo', value: `${r.cant_4xl + r.cant_5xl} (${r.cant_4xl} × 4XL · ${r.cant_5xl} × 5XL+)` });
   meta.push({ label: 'Tramo aplicado', value: r.tramo });
@@ -1022,6 +1273,17 @@ function calcularTiempoTotal(r) {
   const p = CFG.parametros;
   const tramo = CFG.tramos.find(t => t.etiqueta === r.tramo);
   const reduc = tramo ? tramo.reduccion_tiempo : 0;
+
+  // En personalizado cada línea puede tener caras distintas.
+  if (r.es_personalizado) {
+    let total = 0;
+    for (const d of r.desglose || []) {
+      const base = d.caras === 2 ? p.minutos_2caras_base : p.minutos_1cara_base;
+      total += d.cantidad * base * (1 - reduc);
+    }
+    return total;
+  }
+
   const cantidad = r.es_mixto ? r.cantidad_total : r.cantidad;
   // Para pena son dos prendas por pack
   const pack = CFG.packs[estado.packId];
@@ -1053,6 +1315,14 @@ function copiarResumen() {
   if (r.recargos > 0) {
     lineas.push(`Recargo tallas grandes: ${fmtEur(r.recargos)} (${r.cant_4xl} × 4XL · ${r.cant_5xl} × 5XL+)`);
   }
+  if (r.extras_sin_iva > 0) {
+    const e = r.extras_detalle || {};
+    const partes = [];
+    if (e.nombres)        partes.push(`${e.nombres} nombre${e.nombres > 1 ? 's' : ''}`);
+    if (e.mangas_cortas)  partes.push(`${e.mangas_cortas} manga${e.mangas_cortas > 1 ? 's' : ''} corta${e.mangas_cortas > 1 ? 's' : ''}`);
+    if (e.mangas_largas)  partes.push(`${e.mangas_largas} manga${e.mangas_largas > 1 ? 's' : ''} larga${e.mangas_largas > 1 ? 's' : ''}`);
+    lineas.push(`Extras opcionales (sin IVA): ${fmtEur(r.extras_sin_iva)} (${partes.join(' · ')})`);
+  }
   navigator.clipboard.writeText(lineas.join('\n')).catch(() => {});
 }
 
@@ -1066,6 +1336,9 @@ function resetear() {
   if (estado.packId) renderInputsPack(estado.packId);
   el('cant_4xl').value = '0';
   el('cant_5xl').value = '0';
+  el('cant_nombres').value = '0';
+  el('cant_mangas_cortas').value = '0';
+  el('cant_mangas_largas').value = '0';
   hide('error-msg');
   recalcularPreview();
 }
@@ -1113,7 +1386,13 @@ function cerrarAdmin() {
 
 async function loginAdmin() {
   const clave = el('admin-clave').value;
-  if (clave === CFG.admin.clave) {
+  // La clave admin no viaja al renderer: la verificación ocurre en main
+  // (timing-safe). Así DevTools no puede leer la clave del CFG cargado.
+  const r = await window.packprice.verificarAdmin({
+    ruta: SETTINGS.ruta_config,
+    clave
+  });
+  if (r && r.ok && r.valida) {
     estado.esAdmin = true;
     el('btn-admin-toggle').innerHTML = '<svg class="icon"><use href="#i-lock"/></svg> Admin activo';
     el('btn-admin-toggle').classList.remove('btn-secondary');

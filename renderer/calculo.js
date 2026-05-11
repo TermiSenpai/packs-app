@@ -7,6 +7,36 @@
 // ============================================================
 
 /**
+ * Calcula extras opcionales (nombre, mangas estampadas) en euros.
+ *
+ * Los precios del config (extra_*_eur) están SIN IVA. Devolvemos
+ * tanto el subtotal sin IVA (lo que el usuario ha "pedido") como su
+ * equivalente IVA-incl., para sumarlo al total que el resto del flujo
+ * trata como IVA-incl. Si no hay extras, todo es 0.
+ *
+ * @param cfg
+ * @param extras  { nombres, mangas_cortas, mangas_largas }
+ */
+export function calcularExtras(cfg, extras) {
+  const e = extras || {};
+  const p = cfg.parametros;
+  const nombres       = e.nombres       || 0;
+  const mangasCortas  = e.mangas_cortas || 0;
+  const mangasLargas  = e.mangas_largas || 0;
+
+  const sinIva = nombres      * (p.extra_nombre_eur      || 0)
+              + mangasCortas  * (p.extra_manga_corta_eur || 0)
+              + mangasLargas  * (p.extra_manga_larga_eur || 0);
+  const ivaInc = sinIva * (1 + (p.iva || 0));
+
+  return {
+    sin_iva: sinIva,
+    iva_inc: ivaInc,
+    detalle: { nombres, mangas_cortas: mangasCortas, mangas_largas: mangasLargas }
+  };
+}
+
+/**
  * Devuelve el tramo de volumen que corresponde a una cantidad,
  * o null si no encaja en ninguno (cantidad < min de T1).
  */
@@ -60,7 +90,7 @@ export function calcularCostePrenda(cfg, modeloId, caras, tramo, totalPrendasPar
  * `capucha`). El tramo se calcula sobre la cantidad de packs.
  */
 export function calcularPackPena(cfg, opt) {
-  const { cantidad, capucha, caras, cant_4xl, cant_5xl } = opt;
+  const { cantidad, capucha, caras, cant_4xl, cant_5xl, extras } = opt;
   const pack = cfg.packs.pena_completa;
 
   if (cantidad < pack.min) {
@@ -82,7 +112,7 @@ export function calcularPackPena(cfg, opt) {
   return calcularTotales(cfg, {
     pack: pack.nombre, tramo: tramo.etiqueta, cantidad,
     pvp_unitario: pvpUnit, coste_unitario: costePack,
-    cant_4xl, cant_5xl,
+    cant_4xl, cant_5xl, extras,
     detalle_extra: { capucha: capuchaKey, caras }
   });
 }
@@ -91,7 +121,7 @@ export function calcularPackPena(cfg, opt) {
  * Packs individuales: solo camisetas, solo CLASICA, solo URBAN.
  */
 export function calcularPackIndividual(cfg, packId, opt) {
-  const { cantidad, caras, cant_4xl, cant_5xl } = opt;
+  const { cantidad, caras, cant_4xl, cant_5xl, extras } = opt;
   const pack = cfg.packs[packId];
 
   if (cantidad < pack.min) {
@@ -107,7 +137,7 @@ export function calcularPackIndividual(cfg, packId, opt) {
   return calcularTotales(cfg, {
     pack: pack.nombre, tramo: tramo.etiqueta, cantidad,
     pvp_unitario: pvpUnit, coste_unitario: costeUnit.total,
-    cant_4xl, cant_5xl,
+    cant_4xl, cant_5xl, extras,
     detalle_extra: { modelo: pack.modelo, caras }
   });
 }
@@ -117,7 +147,7 @@ export function calcularPackIndividual(cfg, packId, opt) {
  * sobre la suma; cada sudadera se factura a su PVP individual.
  */
 export function calcularPackMixto(cfg, opt) {
-  const { cant_clasica, cant_urban, caras, cant_4xl, cant_5xl } = opt;
+  const { cant_clasica, cant_urban, caras, cant_4xl, cant_5xl, extras } = opt;
   const pack = cfg.packs.sudaderas_mixto;
   const total = cant_clasica + cant_urban;
 
@@ -137,7 +167,8 @@ export function calcularPackMixto(cfg, opt) {
   const subtotal = (cant_clasica * pvpClasica) + (cant_urban * pvpUrban);
   const recargos = (cant_4xl * cfg.parametros.recargo_4xl_eur)
                  + (cant_5xl * cfg.parametros.recargo_5xl_eur);
-  const totalIvaInc = subtotal + recargos;
+  const extrasCalc = calcularExtras(cfg, extras);
+  const totalIvaInc = subtotal + recargos + extrasCalc.iva_inc;
 
   const costeClasica = calcularCostePrenda(cfg, 'CLASICA', caras, tramo, total);
   const costeUrban   = calcularCostePrenda(cfg, 'URBAN',   caras, tramo, total);
@@ -155,20 +186,104 @@ export function calcularPackMixto(cfg, opt) {
       { modelo: 'CLASICA', nombre: cfg.modelos_roly.CLASICA.nombre, cantidad: cant_clasica, pvp: pvpClasica, subtotal: cant_clasica * pvpClasica },
       { modelo: 'URBAN',   nombre: cfg.modelos_roly.URBAN.nombre,   cantidad: cant_urban,   pvp: pvpUrban,   subtotal: cant_urban * pvpUrban }
     ],
-    subtotal, recargos, total_iva_inc: totalIvaInc, base_venta: baseVenta, iva,
+    subtotal, recargos,
+    extras_sin_iva: extrasCalc.sin_iva, extras_detalle: extrasCalc.detalle,
+    total_iva_inc: totalIvaInc, base_venta: baseVenta, iva,
     coste_total: costeTotal, margen, margen_pct: margenPct
   };
 }
 
 /**
- * Calcula subtotales, IVA y márgenes a partir de cantidad × pvp + recargos.
- * Compartido por pack peña y packs individuales (no mixto).
+ * Pack personalizado: el usuario añade N líneas, cada una con su
+ * modelo Roly, cantidad y caras (1 ó 2). El tramo se calcula sobre la
+ * suma total de prendas y cada línea factura al PVP del pack individual
+ * que le corresponde a ese modelo (vía `pack.modelos_referencia`).
+ *
+ * @param cfg
+ * @param opt  { lineas:[{modelo,cantidad,caras}], cant_4xl, cant_5xl }
+ */
+export function calcularPackPersonalizado(cfg, opt) {
+  const { lineas, cant_4xl, cant_5xl, extras } = opt;
+  const pack = cfg.packs.personalizado;
+
+  const lineasValidas = (lineas || []).filter(l => l && l.cantidad > 0);
+  if (lineasValidas.length === 0) {
+    return { error: 'Añade al menos una línea con cantidad mayor que cero.' };
+  }
+
+  const total = lineasValidas.reduce((s, l) => s + l.cantidad, 0);
+  if (total < pack.min_total) {
+    return { error: `Mínimo ${pack.min_total} prendas en total.` };
+  }
+
+  const tramo = getTramo(cfg, total);
+  if (!tramo) {
+    return { error: `No hay tramo definido para ${total} unidades.` };
+  }
+
+  const desglose = [];
+  let subtotal = 0;
+  let costeTotal = 0;
+
+  for (const l of lineasValidas) {
+    const refPackId = pack.modelos_referencia?.[l.modelo];
+    const refPack = refPackId ? cfg.packs[refPackId] : null;
+    if (!refPack || !refPack.pvp) {
+      return { error: `No hay PVP de referencia para el modelo ${l.modelo}.` };
+    }
+    const carasKey = (l.caras === 2) ? 'dos_caras' : 'una_cara';
+    const pvp = refPack.pvp[carasKey]?.[tramo.id];
+    if (pvp === undefined || pvp === null) {
+      return { error: `Falta PVP de ${refPackId} (${carasKey}, ${tramo.id}).` };
+    }
+
+    const sub = l.cantidad * pvp;
+    subtotal += sub;
+
+    const coste = calcularCostePrenda(cfg, l.modelo, l.caras, tramo, total);
+    costeTotal += l.cantidad * coste.total;
+
+    const m = cfg.modelos_roly[l.modelo];
+    desglose.push({
+      modelo: l.modelo,
+      nombre: m ? m.nombre : l.modelo,
+      cantidad: l.cantidad,
+      caras: l.caras,
+      pvp,
+      subtotal: sub
+    });
+  }
+
+  const recargos = (cant_4xl * cfg.parametros.recargo_4xl_eur)
+                 + (cant_5xl * cfg.parametros.recargo_5xl_eur);
+  const extrasCalc = calcularExtras(cfg, extras);
+  const totalIvaInc = subtotal + recargos + extrasCalc.iva_inc;
+  const baseVenta = totalIvaInc / (1 + cfg.parametros.iva);
+  const iva = totalIvaInc - baseVenta;
+  const margen = baseVenta - costeTotal;
+  const margenPct = totalIvaInc > 0 ? (margen / totalIvaInc) : 0;
+
+  return {
+    pack: pack.nombre, tramo: tramo.etiqueta, es_mixto: true, es_personalizado: true,
+    cantidad_total: total, cant_4xl, cant_5xl,
+    desglose,
+    subtotal, recargos,
+    extras_sin_iva: extrasCalc.sin_iva, extras_detalle: extrasCalc.detalle,
+    total_iva_inc: totalIvaInc, base_venta: baseVenta, iva,
+    coste_total: costeTotal, margen, margen_pct: margenPct
+  };
+}
+
+/**
+ * Calcula subtotales, IVA y márgenes a partir de cantidad × pvp + recargos
+ * + extras opcionales. Compartido por pack peña y packs individuales (no mixto).
  */
 export function calcularTotales(cfg, datos) {
   const subtotal = datos.cantidad * datos.pvp_unitario;
   const recargos = (datos.cant_4xl * cfg.parametros.recargo_4xl_eur)
                  + (datos.cant_5xl * cfg.parametros.recargo_5xl_eur);
-  const totalIvaInc = subtotal + recargos;
+  const extras = calcularExtras(cfg, datos.extras);
+  const totalIvaInc = subtotal + recargos + extras.iva_inc;
   const baseVenta = totalIvaInc / (1 + cfg.parametros.iva);
   const iva = totalIvaInc - baseVenta;
   const costeTotal = datos.cantidad * datos.coste_unitario;
@@ -178,7 +293,9 @@ export function calcularTotales(cfg, datos) {
   return {
     pack: datos.pack, tramo: datos.tramo, cantidad: datos.cantidad,
     pvp_unitario: datos.pvp_unitario, cant_4xl: datos.cant_4xl, cant_5xl: datos.cant_5xl,
-    subtotal, recargos, total_iva_inc: totalIvaInc, base_venta: baseVenta, iva,
+    subtotal, recargos,
+    extras_sin_iva: extras.sin_iva, extras_detalle: extras.detalle,
+    total_iva_inc: totalIvaInc, base_venta: baseVenta, iva,
     coste_unitario: datos.coste_unitario, coste_total: costeTotal,
     margen, margen_pct: margenPct,
     extra: datos.detalle_extra

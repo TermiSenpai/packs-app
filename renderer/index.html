@@ -316,12 +316,45 @@
               </div>
             </article>
 
+            <article class="section-card">
+              <div class="section-card__head">
+                <div>
+                  <h2 class="h-card">Extras opcionales</h2>
+                  <p class="text-secondary" style="margin-top: 4px; font-size: 13px;">
+                    Personalización extra. Precios sin IVA: se suman al subtotal y se aplica el IVA al total.
+                  </p>
+                </div>
+                <span class="badge badge--neutral">IVA no incluido</span>
+              </div>
+
+              <div class="form-grid-3">
+                <div class="field">
+                  <label class="field__label" for="cant_nombres">
+                    Nombre <span class="field__hint">(+<span data-cfg="extra_nombre_eur">1.5</span> €/ud)</span>
+                  </label>
+                  <input type="number" id="cant_nombres" min="0" value="0">
+                </div>
+                <div class="field">
+                  <label class="field__label" for="cant_mangas_cortas">
+                    Mangas cortas <span class="field__hint">(+<span data-cfg="extra_manga_corta_eur">1.5</span> €/manga)</span>
+                  </label>
+                  <input type="number" id="cant_mangas_cortas" min="0" value="0">
+                </div>
+                <div class="field">
+                  <label class="field__label" for="cant_mangas_largas">
+                    Manga larga <span class="field__hint">(+<span data-cfg="extra_manga_larga_eur">3</span> €/manga)</span>
+                  </label>
+                  <input type="number" id="cant_mangas_largas" min="0" value="0">
+                </div>
+              </div>
+            </article>
+
             <div id="error-msg" class="alert alert-error hidden"></div>
 
             <div class="paso2-actions">
               <button id="btn-reset" class="btn btn-ghost" type="button">Reiniciar</button>
               <button id="btn-calcular" class="btn btn-primary" type="button">
-                <svg class="icon"><use href="#i-calculator"/></svg> Calcular precio
+                <svg class="icon"><use href="#i-arrow-right"/></svg> Ver desglose
               </button>
             </div>
           </div>
@@ -372,17 +405,6 @@
       </section>
 
     </main>
-
-    <footer class="footer">
-      <div class="footer__left">
-        <span class="text-mono">v<span id="cfg-version-foot">-</span></span>
-        <span>Modificado por <span id="cfg-modificado-por">-</span></span>
-        <span>PackPrice · uso interno taller</span>
-      </div>
-      <div class="footer__right" id="footer-status">
-        <span class="badge badge--success badge--dot">NAS conectado</span>
-      </div>
-    </footer>
   </div>
 
   <!-- ================== MODAL: ADMIN ================== -->
@@ -455,7 +477,7 @@
           <div class="modal__foot-right">
             <button id="btn-cancelar-admin" class="btn btn-ghost" type="button">Cancelar cambios</button>
             <button id="btn-guardar-config" class="btn btn-primary" type="button">
-              <svg class="icon"><use href="#i-save"/></svg> Guardar en NAS
+              <svg class="icon"><use href="#i-save"/></svg> Guardar
             </button>
           </div>
         </footer>

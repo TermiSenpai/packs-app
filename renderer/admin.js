@@ -22,6 +22,11 @@ const PARAMETROS_GRUPOS = [
     { key: 'recargo_5xl_eur',      label: 'Recargo 5XL+ (€/prenda)', step: 0.01, min: 0 },
     { key: 'buffer_3xl_eur_pack',  label: 'Buffer 3XL (€/pack peña)', hint: 'Colchón interno · no se factura', step: 0.01, min: 0 }
   ]},
+  { titulo: 'Extras opcionales (sin IVA)', items: [
+    { key: 'extra_nombre_eur',      label: 'Nombre (€/ud)',         hint: 'Sin IVA · se factura al cliente', step: 0.01, min: 0 },
+    { key: 'extra_manga_corta_eur', label: 'Manga corta (€/manga)', hint: 'Sin IVA', step: 0.01, min: 0 },
+    { key: 'extra_manga_larga_eur', label: 'Manga larga (€/manga)', hint: 'Sin IVA', step: 0.01, min: 0 }
+  ]},
   { titulo: 'Mano de obra y costes', items: [
     { key: 'mo_eur_hora',          label: 'Mano de obra (€/hora)', step: 0.5, min: 0 },
     { key: 'indirectos_eur_prenda', label: 'Indirectos (€/prenda)', step: 0.01, min: 0 }
@@ -206,7 +211,6 @@ export function renderAdminPacks(cfg) {
           <header class="admin-pack__head">
             <span class="admin-pack__dot"></span>
             <h4>${esc(pack.nombre)}</h4>
-            <span class="admin-pack__id">${esc(id)}</span>
           </header>
           <div class="admin-pack__body">
             <p class="hint">Reusa los PVP de
@@ -220,12 +224,34 @@ export function renderAdminPacks(cfg) {
       continue;
     }
 
+    if (pack.tipo === 'personalizado') {
+      const refs = Object.entries(pack.modelos_referencia || {})
+        .map(([modelo, refId]) => `<strong>${esc(modelo)}</strong> → <code>${esc(refId)}</code>`)
+        .join(' · ');
+      html += `
+        <section class="admin-pack" style="--pack-color: var(${colorToken});">
+          <header class="admin-pack__head">
+            <span class="admin-pack__dot"></span>
+            <h4>${esc(pack.nombre)}</h4>
+          </header>
+          <div class="admin-pack__body">
+            <p class="hint">
+              Mínimo total: <strong>${pack.min_total ?? '—'}</strong> prendas.
+              Cada modelo factura al PVP del pack indicado:
+              ${refs || '—'}.
+              Edita los precios en cada pack individual.
+            </p>
+          </div>
+        </section>
+      `;
+      continue;
+    }
+
     html += `<section class="admin-pack" style="--pack-color: var(${colorToken});">`;
     html += `
       <header class="admin-pack__head">
         <span class="admin-pack__dot"></span>
         <h4>${esc(pack.nombre)}</h4>
-        <span class="admin-pack__id">${esc(id)}</span>
       </header>
       <div class="admin-pack__body">
     `;

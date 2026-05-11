@@ -4,7 +4,8 @@
 // Estos son los valores iniciales con los que se creará el
 // archivo config.js en el NAS si no existe en el primer arranque.
 //
-// Fuente: PLAN_Calculadora.md (secciones 2 y 3).
+// Fuente: PLAN_Calculadora.md (secciones 2 y 3) y los valores
+// reales en uso del config test (CONFIG TEST/config.js).
 //
 // Este módulo se usa SOLO en el proceso principal (main.js).
 // El renderer trabaja siempre con la copia leída de disco.
@@ -13,7 +14,7 @@
 'use strict';
 
 const VERSION = '2.0.0';
-const ADMIN_CLAVE_DEFAULT = 'packprice2026';
+const ADMIN_CLAVE_DEFAULT = 'fuzfuz2026';
 
 // --- Parámetros base (sección 2.1 del plan) ---
 const PARAMETROS = {
@@ -30,8 +31,12 @@ const PARAMETROS = {
   dtf_metros_2caras:     0.40,
   dtf_metros_1cara:      0.20,
   planchado_eur_cara:    0.30,
-  minutos_2caras_base:   5,
-  minutos_1cara_base:    3
+  minutos_2caras_base:   7,
+  minutos_1cara_base:    5,
+  // Extras opcionales (precios SIN IVA — se les aplica IVA al sumarlos al total)
+  extra_nombre_eur:      1.5,
+  extra_manga_corta_eur: 1.5,
+  extra_manga_larga_eur: 3
 };
 
 // --- Modelos Roly (sección 2.2 del plan) ---
@@ -55,17 +60,17 @@ const MODELOS_ROLY = {
 
 // --- Tramos de volumen (sección 2.3 del plan) ---
 const TRAMOS = [
-  { id: 'T1', etiqueta: 'Pedido pequeño',    desde: 10,  hasta: 24,   reduccion_tiempo: 0    },
-  { id: 'T2', etiqueta: 'Pedido medio',      desde: 25,  hasta: 49,   reduccion_tiempo: 0.10 },
-  { id: 'T3', etiqueta: 'Pedido grande',     desde: 50,  hasta: 99,   reduccion_tiempo: 0.15 },
-  { id: 'T4', etiqueta: 'Pedido muy grande', desde: 100, hasta: null, reduccion_tiempo: 0.20 }
+  { id: 'T1', etiqueta: '10-24 uds',  desde: 10,  hasta: 24,   reduccion_tiempo: 0    },
+  { id: 'T2', etiqueta: '25-49 uds',  desde: 25,  hasta: 49,   reduccion_tiempo: 0.10 },
+  { id: 'T3', etiqueta: '50-99 uds',  desde: 50,  hasta: 99,   reduccion_tiempo: 0.15 },
+  { id: 'T4', etiqueta: '100+ uds',   desde: 100, hasta: null, reduccion_tiempo: 0.20 }
 ];
 
 // --- Packs comerciales (sección 3 del plan) ---
 const PACKS = {
   pena_completa: {
     tipo:   'pena',
-    nombre: 'Pack peña (camiseta + sudadera)',
+    nombre: 'Pack Peña (camiseta + sudadera)',
     min:    10,
     pvp: {
       sin_capucha: {
@@ -81,18 +86,18 @@ const PACKS = {
 
   solo_camisetas: {
     tipo:   'individual',
-    nombre: 'Solo camisetas (BEAGLE)',
+    nombre: 'Pack solo camisetas',
     min:    10,
     modelo: 'BEAGLE',
     pvp: {
-      dos_caras: { T1: 9.95, T2: 8.99, T3: 8.45, T4: 7.99 },
-      una_cara:  { T1: 8.95, T2: 7.99, T3: 7.45, T4: 6.99 }
+      dos_caras: { T1: 11.99, T2: 10.99, T3: 9.99, T4: 8.99 },
+      una_cara:  { T1: 9.99,  T2: 8.99,  T3: 8.45, T4: 7.99 }
     }
   },
 
   solo_clasica: {
     tipo:   'individual',
-    nombre: 'Solo sudaderas SIN capucha (CLASICA)',
+    nombre: 'Pack solo sudaderas sin capucha',
     min:    10,
     modelo: 'CLASICA',
     pvp: {
@@ -103,7 +108,7 @@ const PACKS = {
 
   solo_urban: {
     tipo:   'individual',
-    nombre: 'Solo sudaderas CON capucha (URBAN)',
+    nombre: 'Pack solo sudaderas con capucha',
     min:    10,
     modelo: 'URBAN',
     pvp: {
@@ -114,9 +119,22 @@ const PACKS = {
 
   sudaderas_mixto: {
     tipo:      'mixto',
-    nombre:    'Pack mixto sudaderas (CLASICA + URBAN)',
+    nombre:    'Pack mixto sudaderas (capucha + sin capucha)',
     min_total: 10,
     packs_referencia: {
+      CLASICA: 'solo_clasica',
+      URBAN:   'solo_urban'
+    }
+  },
+
+  personalizado: {
+    tipo:      'personalizado',
+    nombre:    'Pack personalizado',
+    min_total: 10,
+    // Cada modelo Roly se factura al PVP del pack individual indicado
+    // aquí. Si en el futuro entra un modelo nuevo, añadir su pareja.
+    modelos_referencia: {
+      BEAGLE:  'solo_camisetas',
       CLASICA: 'solo_clasica',
       URBAN:   'solo_urban'
     }
