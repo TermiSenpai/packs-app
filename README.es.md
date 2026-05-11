@@ -21,15 +21,15 @@ Calculadora de escritorio para presupuestar **packs de personalización textil D
 
 ## Stack y filosofía
 
-| Pieza | Decisión |
-| --- | --- |
-| Runtime | Electron + Node.js (main) + Chromium (renderer) |
-| UI | HTML + CSS + JS vanilla (sin framework, sin build step) |
+| Pieza                   | Decisión                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------ |
+| Runtime                 | Electron + Node.js (main) + Chromium (renderer)                                      |
+| UI                      | HTML + CSS + JS vanilla (sin framework, sin build step)                              |
 | Persistencia compartida | `config.js` plano en el NAS, parseado en sandbox (`vm.runInNewContext`, timeout 1 s) |
-| Persistencia local | `settings.json` en `%APPDATA%\packprice\` |
-| Tests | Vitest sobre la lógica de cálculo y el parser de config |
-| Empaquetado | `electron-builder` portable Windows x64 |
-| Idioma | Español (dominio, comentarios, UI) |
+| Persistencia local      | `settings.json` en `%APPDATA%\packprice\`                                            |
+| Tests                   | Vitest sobre la lógica de cálculo y el parser de config                              |
+| Empaquetado             | `electron-builder` portable Windows x64                                              |
+| Idioma                  | Español (dominio, comentarios, UI)                                                   |
 
 Cero dependencias en runtime. Sólo `electron`, `electron-builder` y `vitest` como `devDependencies`. Las restricciones, principios de diseño e invariantes de seguridad están en [CLAUDE.md](CLAUDE.md).
 
@@ -80,13 +80,13 @@ Detalles de empaquetado, distribución a otros PCs y resolución de problemas: [
 
 Versiones pasadas y previstas. La V4 sólo se aborda si se cruza el umbral cuantitativo descrito; lo demás puede ocurrir antes según necesidad.
 
-| Versión | Estado | Alcance |
-| --- | --- | --- |
-| V1 (web) | Cerrada | Prototipo en navegador, sin persistencia compartida |
-| V2 (Electron) | **Beta actual** | App de escritorio, `config.js` en NAS, modo admin, conflictos, backups |
-| V2.x | En curso | Cierre de PVPs provisionales (sudaderas), pulido UI, más tests |
-| V3 | Planificado | Historial de presupuestos por PC (`localStorage`), exportación a PDF |
-| V4 | Condicional | Backend HTTP local (Node + Express + SQLite) si se superan ~5 usuarios o se piden reportes cross-PC. Auto-update con `electron-updater` |
+| Versión       | Estado          | Alcance                                                                                                                                 |
+| ------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| V1 (web)      | Cerrada         | Prototipo en navegador, sin persistencia compartida                                                                                     |
+| V2 (Electron) | **Beta actual** | App de escritorio, `config.js` en NAS, modo admin, conflictos, backups                                                                  |
+| V2.x          | En curso        | Cierre de PVPs provisionales (sudaderas), pulido UI, más tests                                                                          |
+| V3            | Planificado     | Historial de presupuestos por PC (`localStorage`), exportación a PDF                                                                    |
+| V4            | Condicional     | Backend HTTP local (Node + Express + SQLite) si se superan ~5 usuarios o se piden reportes cross-PC. Auto-update con `electron-updater` |
 
 Decisiones contempladas pero **deliberadamente fuera de alcance hoy**: TypeScript, frameworks UI (React/Vue/Svelte), bundlers, telemetría, internacionalización. Justificación y criterios para reconsiderar: [CLAUDE.md §11](CLAUDE.md).
 
@@ -116,7 +116,7 @@ Proyecto interno de empresa pequeña (2–3 usuarios). No se aceptan PRs de terc
 El diseño prioriza **claridad sobre flexibilidad**, **datos fuera del código** y **mínimo mantenimiento**: si un PVP cambia, el cambio es de datos, no de despliegue. La app debe seguir siendo entendible y editable por una sola persona dentro de cinco años.
 
 - **Autor**: Alejandro Escarpa Prieto
-- **Contexto**: empresa familiar, uso interno, sin telemetría ni servicios en la nube
+- **Contexto**: empresa, uso interno, sin telemetría ni servicios en la nube
 - **Principios**: YAGNI, fail-fast, español en el dominio, cero build step
 
 ---

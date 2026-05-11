@@ -21,15 +21,15 @@ Desktop calculator for quoting **DTF (Direct-to-Film) textile customization pack
 
 ## Stack and philosophy
 
-| Piece | Decision |
-| --- | --- |
-| Runtime | Electron + Node.js (main) + Chromium (renderer) |
-| UI | HTML + CSS + vanilla JS (no framework, no build step) |
+| Piece              | Decision                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| Runtime            | Electron + Node.js (main) + Chromium (renderer)                                       |
+| UI                 | HTML + CSS + vanilla JS (no framework, no build step)                                 |
 | Shared persistence | Plain `config.js` on the NAS, parsed in a sandbox (`vm.runInNewContext`, 1 s timeout) |
-| Local persistence | `settings.json` in `%APPDATA%\packprice\` |
-| Tests | Vitest over the calculation logic and the config parser |
-| Packaging | `electron-builder` portable Windows x64 |
-| Language | Spanish (domain, comments, UI) |
+| Local persistence  | `settings.json` in `%APPDATA%\packprice\`                                             |
+| Tests              | Vitest over the calculation logic and the config parser                               |
+| Packaging          | `electron-builder` portable Windows x64                                               |
+| Language           | Spanish (domain, comments, UI)                                                        |
 
 Zero runtime dependencies. Only `electron`, `electron-builder` and `vitest` as `devDependencies`. Constraints, design principles and security invariants live in [CLAUDE.md](CLAUDE.md) (Spanish).
 
@@ -81,13 +81,13 @@ Packaging details, distribution to other PCs and troubleshooting: [README-build.
 
 Past and planned versions. V4 is only on the table once the quantitative threshold below is crossed; everything else may happen sooner if needed.
 
-| Version | Status | Scope |
-| --- | --- | --- |
-| V1 (web) | Closed | Browser prototype, no shared persistence |
-| V2 (Electron) | **Current beta** | Desktop app, `config.js` on NAS, admin mode, conflict handling, backups |
-| V2.x | In progress | Finalize provisional prices (hoodies), UI polish, more tests |
-| V3 | Planned | Per-PC quote history (`localStorage`), PDF export |
-| V4 | Conditional | Local HTTP backend (Node + Express + SQLite) if more than ~5 users or cross-PC reporting is needed. Auto-update via `electron-updater` |
+| Version       | Status           | Scope                                                                                                                                  |
+| ------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| V1 (web)      | Closed           | Browser prototype, no shared persistence                                                                                               |
+| V2 (Electron) | **Current beta** | Desktop app, `config.js` on NAS, admin mode, conflict handling, backups                                                                |
+| V2.x          | In progress      | Finalize provisional prices (hoodies), UI polish, more tests                                                                           |
+| V3            | Planned          | Per-PC quote history (`localStorage`), PDF export                                                                                      |
+| V4            | Conditional      | Local HTTP backend (Node + Express + SQLite) if more than ~5 users or cross-PC reporting is needed. Auto-update via `electron-updater` |
 
 Decisions deliberately **out of scope today**: TypeScript, UI frameworks (React/Vue/Svelte), bundlers, telemetry, internationalization. Rationale and criteria for revisiting them: [CLAUDE.md §11](CLAUDE.md).
 
@@ -117,7 +117,7 @@ Internal project of a small business (2–3 users). Third-party PRs are not acce
 The design prioritizes **clarity over flexibility**, **data outside the code** and **minimum maintenance**: if a price changes, the change is data, not a deployment. The app must remain understandable and editable by a single person five years from now.
 
 - **Author**: Alejandro Escarpa Prieto
-- **Context**: family business, internal use, no telemetry, no cloud services
+- **Context**: business, internal use, no telemetry, no cloud services
 - **Principles**: YAGNI, fail-fast, Spanish in the domain, no build step
 
 ---
