@@ -6,7 +6,7 @@
 
 ## 1. Contexto y objetivo
 
-**Cliente / proyecto**: empresa de personalización textil DTF en Guadalajara (España), más de 10 años en el sector. La calculadora interna se llama **PackPrice**.
+**Cliente / proyecto**: empresa de personalización textil DTF en Guadalajara (España), más de 25 años en el sector. La calculadora interna se llama **PackPrice**.
 
 **Objetivo del proyecto**: dotar al taller de una calculadora interna para presupuestar rápidamente "packs de peña" (encargos típicos de grupos de amigos en verano) con varias modalidades, manteniendo márgenes sanos y permitiendo comunicar precios públicos consistentes con descuento por volumen.
 
@@ -18,46 +18,46 @@
 
 ### 2.1. Parámetros base
 
-| Concepto | Valor | Notas |
-|---|---|---|
-| Mano de obra imputada | 15 €/h por persona | Tasa interna, no sueldo |
-| Tiempo base 2 caras | 5 min/prenda | Reducciones por volumen aplicables |
-| Tiempo base 1 cara | 3 min/prenda | ~60% del tiempo a 2 caras |
-| Reducción tiempo T2 (25-49) | −10% | Por mejora de ritmo y nesting |
-| Reducción tiempo T3 (50-99) | −15% | |
-| Reducción tiempo T4 (100+) | −20% | |
-| DTF (película + tinta) | 1,25 €/metro lineal | Confirmado: incluye película y tinta |
-| DTF metros 2 caras | 0,40 m/prenda | |
-| DTF metros 1 cara | 0,20 m/prenda | |
-| Planchado | 0,30 €/cara | Media 0,25-0,35 € |
-| Merma materiales | 10% | A revisar con datos reales |
-| Indirectos | 0,30 €/prenda | Luz, mantenimiento, packaging |
-| Envío Roly | 5,90 €/bulto (~40 prendas) | Se prorratea entre prendas del pedido |
-| Buffer 3XL | 0,40 €/pack peña | Amortiza recargo 3XL en mix típico |
-| Recargo 4XL | +3 €/prenda | Directo al cliente |
-| Recargo 5XL+ | +5 €/prenda | Directo al cliente |
-| IVA | 21% | Tratado por separado del coste |
+| Concepto                    | Valor                      | Notas                                 |
+| --------------------------- | -------------------------- | ------------------------------------- |
+| Mano de obra imputada       | 15 €/h por persona         | Tasa interna, no sueldo               |
+| Tiempo base 2 caras         | 5 min/prenda               | Reducciones por volumen aplicables    |
+| Tiempo base 1 cara          | 3 min/prenda               | ~60% del tiempo a 2 caras             |
+| Reducción tiempo T2 (25-49) | −10%                       | Por mejora de ritmo y nesting         |
+| Reducción tiempo T3 (50-99) | −15%                       |                                       |
+| Reducción tiempo T4 (100+)  | −20%                       |                                       |
+| DTF (película + tinta)      | 1,25 €/metro lineal        | Confirmado: incluye película y tinta  |
+| DTF metros 2 caras          | 0,40 m/prenda              |                                       |
+| DTF metros 1 cara           | 0,20 m/prenda              |                                       |
+| Planchado                   | 0,30 €/cara                | Media 0,25-0,35 €                     |
+| Merma materiales            | 10%                        | A revisar con datos reales            |
+| Indirectos                  | 0,30 €/prenda              | Luz, mantenimiento, packaging         |
+| Envío Roly                  | 5,90 €/bulto (~40 prendas) | Se prorratea entre prendas del pedido |
+| Buffer 3XL                  | 0,40 €/pack peña           | Amortiza recargo 3XL en mix típico    |
+| Recargo 4XL                 | +3 €/prenda                | Directo al cliente                    |
+| Recargo 5XL+                | +5 €/prenda                | Directo al cliente                    |
+| IVA                         | 21%                        | Tratado por separado del coste        |
 
 **Sobre el IVA**: el IVA soportado en compras (Roly, DTF, envío) NO se incluye como coste al calcular el margen. Se deduce trimestralmente en el Modelo 303 contra el IVA repercutido. Lo que sí afecta es la tesorería entre que pagas Roly con IVA y cobras al cliente con IVA repercutido.
 
 ### 2.2. Modelos Roly utilizados
 
-| Modelo | Referencia | Precio | Uso |
-|---|---|---|---|
-| BEAGLE | CA65540558 | 1,7325 € | Camiseta |
-| CLASICA | SU10700558 | 6,2475 € | Sudadera sin capucha |
-| URBAN | SU1067050258 | 7,8750 € | Sudadera con capucha |
+| Modelo  | Referencia   | Precio   | Uso                  |
+| ------- | ------------ | -------- | -------------------- |
+| BEAGLE  | CA65540558   | 1,7325 € | Camiseta             |
+| CLASICA | SU10700558   | 6,2475 € | Sudadera sin capucha |
+| URBAN   | SU1067050258 | 7,8750 € | Sudadera con capucha |
 
 Precios sin recargo por talla 2XL. Tallas 3XL+ tienen recargo en Roly que se amortiza con el buffer y los recargos directos al cliente.
 
 ### 2.3. Tramos de volumen
 
-| Tramo | Rango | Reducción tiempo | Etiqueta |
-|---|---|---|---|
-| T1 | 10-24 uds | 0% | Pedido pequeño |
-| T2 | 25-49 uds | 10% | Pedido medio |
-| T3 | 50-99 uds | 15% | Pedido grande |
-| T4 | 100+ uds | 20% | Pedido muy grande |
+| Tramo | Rango     | Reducción tiempo | Etiqueta          |
+| ----- | --------- | ---------------- | ----------------- |
+| T1    | 10-24 uds | 0%               | Pedido pequeño    |
+| T2    | 25-49 uds | 10%              | Pedido medio      |
+| T3    | 50-99 uds | 15%              | Pedido grande     |
+| T4    | 100+ uds  | 20%              | Pedido muy grande |
 
 El "uds" es packs en pack peña, prendas individuales en los demás packs, o suma de sudaderas en el pack mixto.
 
@@ -73,12 +73,12 @@ Pack base. Combina BEAGLE + CLASICA (sin capucha) o BEAGLE + URBAN (con capucha)
 
 **PVP IVA incluido**:
 
-| Tramo | Sin capucha 2c | Sin capucha 1c | Con capucha 2c | Con capucha 1c |
-|---|---|---|---|---|
-| T1 (10-24) | 25,95 € | 22,95 € | 28,95 € | 25,95 € |
-| T2 (25-49) | 24,95 € | 21,95 € | 27,95 € | 24,95 € |
-| T3 (50-99) | 23,95 € | 20,95 € | 26,95 € | 23,95 € |
-| T4 (100+) | 22,95 € | 19,95 € | 25,95 € | 22,95 € |
+| Tramo      | Sin capucha 2c | Sin capucha 1c | Con capucha 2c | Con capucha 1c |
+| ---------- | -------------- | -------------- | -------------- | -------------- |
+| T1 (10-24) | 25,95 €        | 22,95 €        | 28,95 €        | 25,95 €        |
+| T2 (25-49) | 24,95 €        | 21,95 €        | 27,95 €        | 24,95 €        |
+| T3 (50-99) | 23,95 €        | 20,95 €        | 26,95 €        | 23,95 €        |
+| T4 (100+)  | 22,95 €        | 19,95 €        | 25,95 €        | 22,95 €        |
 
 **Regla**: 1 cara = 2 caras − 3 €.
 
@@ -88,34 +88,34 @@ Solo camisetas estampadas. Mínimo 10 camisetas.
 
 **PVP IVA incluido**:
 
-| Tramo | 2 caras | 1 cara |
-|---|---|---|
-| T1 (10-24) | 9,95 € | 8,95 € |
-| T2 (25-49) | 8,99 € | 7,99 € |
-| T3 (50-99) | 8,45 € | 7,45 € |
-| T4 (100+) | 7,99 € | 6,99 € |
+| Tramo      | 2 caras | 1 cara |
+| ---------- | ------- | ------ |
+| T1 (10-24) | 9,95 €  | 8,95 € |
+| T2 (25-49) | 8,99 €  | 7,99 € |
+| T3 (50-99) | 8,45 €  | 7,45 € |
+| T4 (100+)  | 7,99 €  | 6,99 € |
 
 ### 3.3. Pack solo sudaderas SIN capucha (CLASICA)
 
 Solo sudaderas sin capucha. Mínimo 10 sudaderas. **PVP provisionales pendientes de revisar**.
 
-| Tramo | 2 caras | 1 cara |
-|---|---|---|
+| Tramo      | 2 caras | 1 cara  |
+| ---------- | ------- | ------- |
 | T1 (10-24) | 14,95 € | 12,95 € |
 | T2 (25-49) | 13,95 € | 11,95 € |
 | T3 (50-99) | 12,95 € | 10,95 € |
-| T4 (100+) | 12,45 € | 10,45 € |
+| T4 (100+)  | 12,45 € | 10,45 € |
 
 ### 3.4. Pack solo sudaderas CON capucha (URBAN)
 
 Solo sudaderas con capucha. Mínimo 10 sudaderas. **PVP provisionales pendientes de revisar**.
 
-| Tramo | 2 caras | 1 cara |
-|---|---|---|
+| Tramo      | 2 caras | 1 cara  |
+| ---------- | ------- | ------- |
 | T1 (10-24) | 16,95 € | 14,95 € |
 | T2 (25-49) | 15,95 € | 13,95 € |
 | T3 (50-99) | 14,95 € | 12,95 € |
-| T4 (100+) | 13,95 € | 11,95 € |
+| T4 (100+)  | 13,95 € | 11,95 € |
 
 ### 3.5. Pack mixto sudaderas
 
@@ -318,16 +318,16 @@ En el modal "Ajustes locales". Diálogo nativo para seleccionar nuevo `.js`. Se 
 
 ## 9. Decisiones operativas
 
-| Decisión | Valor |
-|---|---|
-| Stack backend | Node.js (Electron) |
-| Stack frontend | HTML + CSS + JS vanilla |
-| Almacén de datos compartido | `config.js` en NAS |
-| Almacén local de cada PC | `settings.json` en `%APPDATA%` |
-| Distribución del .exe | Manual a cada PC, copia local |
-| Identificación del usuario | Pedida en primer arranque, persistida |
-| Conflictos al guardar | Avisar y dejar elegir (más seguro) |
-| Backups del config | Automáticos antes de cada escritura, en `<NAS>\Packs\backups\` |
+| Decisión                    | Valor                                                                                             |
+| --------------------------- | ------------------------------------------------------------------------------------------------- |
+| Stack backend               | Node.js (Electron)                                                                                |
+| Stack frontend              | HTML + CSS + JS vanilla                                                                           |
+| Almacén de datos compartido | `config.js` en NAS                                                                                |
+| Almacén local de cada PC    | `settings.json` en `%APPDATA%`                                                                    |
+| Distribución del .exe       | Manual a cada PC, copia local                                                                     |
+| Identificación del usuario  | Pedida en primer arranque, persistida                                                             |
+| Conflictos al guardar       | Avisar y dejar elegir (más seguro)                                                                |
+| Backups del config          | Automáticos antes de cada escritura, en `<NAS>\Packs\backups\`                                    |
 | Ruta del config recomendada | UNC: `\\172.26.0.154\Paep\Packs\config.js` (mejor que `Z:\` por independencia de letra de unidad) |
 
 ---
@@ -381,16 +381,16 @@ App de escritorio empaquetada como `.exe` portable. Lee y escribe directamente e
 
 ## 12. Validaciones pendientes
 
-| Asunción | Valor actual | Acción |
-|---|---|---|
-| MO 15 €/h imputada | Provisional | Contrastar con coste real (sueldo + SS + luz prorrateada) |
-| Tiempo 5 min/prenda 2 caras | Provisional | Cronometrar 3 pedidos, si supera 5,5 ajustar |
-| Merma 10% | Provisional | Registrar prendas perdidas en 3 pedidos y calcular % real |
-| DTF 0,40 m por prenda 2 caras | Provisional | Medir consumo real |
-| Buffer 3XL 0,40 €/pack | Provisional | Si tallas 3XL+ superan 25% del mix, subir buffer |
-| Envío Roly 5,90 €/bulto | Confirmado por captura | Verificar que se mantiene en pedidos grandes |
-| **PVP packs nuevos** (camisetas, CLASICA, URBAN, mixto) | Provisionales / parcialmente revisados | Validar todos los tramos antes de uso comercial |
-| Tipo IVA 21% | Confirmado para textil personalizado | — |
+| Asunción                                                | Valor actual                           | Acción                                                    |
+| ------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------- |
+| MO 15 €/h imputada                                      | Provisional                            | Contrastar con coste real (sueldo + SS + luz prorrateada) |
+| Tiempo 5 min/prenda 2 caras                             | Provisional                            | Cronometrar 3 pedidos, si supera 5,5 ajustar              |
+| Merma 10%                                               | Provisional                            | Registrar prendas perdidas en 3 pedidos y calcular % real |
+| DTF 0,40 m por prenda 2 caras                           | Provisional                            | Medir consumo real                                        |
+| Buffer 3XL 0,40 €/pack                                  | Provisional                            | Si tallas 3XL+ superan 25% del mix, subir buffer          |
+| Envío Roly 5,90 €/bulto                                 | Confirmado por captura                 | Verificar que se mantiene en pedidos grandes              |
+| **PVP packs nuevos** (camisetas, CLASICA, URBAN, mixto) | Provisionales / parcialmente revisados | Validar todos los tramos antes de uso comercial           |
+| Tipo IVA 21%                                            | Confirmado para textil personalizado   | —                                                         |
 
 **Revisión recomendada con Anguix (gestor)**:
 
@@ -417,14 +417,14 @@ El `.exe` resultante: `dist/PackPrice-2.0.0-portable.exe`.
 
 ## 14. Resolución de problemas comunes
 
-| Problema | Causa probable | Solución |
-|---|---|---|
-| `npm install` falla con permisos | Terminal sin permisos | Ejecutar como administrador |
-| Build avisa de "code signing" | .exe no firmado | Para uso interno no hace falta firmar; añadir `"sign": null` en package.json si bloquea |
-| Windows SmartScreen avisa al ejecutar | .exe sin firma digital | "Más información" → "Ejecutar de todas formas". Solo primera vez por PC |
-| App no encuentra config.js | NAS desconectado o ruta incorrecta | Comprobar unidad mapeada o usar Ajustes para cambiar ruta |
-| Conflicto al guardar | Otro usuario modificó el archivo | Diálogo nativo permite elegir qué hacer. Backup automático ya creado |
-| Diálogo aparece aunque solo edito yo | Hash compara archivo entero | Es comportamiento esperado, basta con elegir "Sobrescribir" |
+| Problema                              | Causa probable                     | Solución                                                                                |
+| ------------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------- |
+| `npm install` falla con permisos      | Terminal sin permisos              | Ejecutar como administrador                                                             |
+| Build avisa de "code signing"         | .exe no firmado                    | Para uso interno no hace falta firmar; añadir `"sign": null` en package.json si bloquea |
+| Windows SmartScreen avisa al ejecutar | .exe sin firma digital             | "Más información" → "Ejecutar de todas formas". Solo primera vez por PC                 |
+| App no encuentra config.js            | NAS desconectado o ruta incorrecta | Comprobar unidad mapeada o usar Ajustes para cambiar ruta                               |
+| Conflicto al guardar                  | Otro usuario modificó el archivo   | Diálogo nativo permite elegir qué hacer. Backup automático ya creado                    |
+| Diálogo aparece aunque solo edito yo  | Hash compara archivo entero        | Es comportamiento esperado, basta con elegir "Sobrescribir"                             |
 
 ---
 
@@ -447,4 +447,4 @@ El `.exe` resultante: `dist/PackPrice-2.0.0-portable.exe`.
 
 ---
 
-*Documento generado al cierre de la sesión de diseño. Actualizar conforme evolucione el proyecto.*
+_Documento generado al cierre de la sesión de diseño. Actualizar conforme evolucione el proyecto._
