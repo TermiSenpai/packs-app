@@ -33,6 +33,9 @@ contextBridge.exposeInMainWorld('packprice', {
   guardarConfig:     (datos) => ipcRenderer.invoke('config:write', datos),
   guardarConfigForzado: (datos) => ipcRenderer.invoke('config:force-write', datos),
 
+  // --- Verificación de clave admin (la comparación ocurre en main) ---
+  verificarAdmin:    (datos) => ipcRenderer.invoke('auth:verify-admin', datos),
+
   // --- Diálogos nativos ---
   confirmarConflicto: (d) => ipcRenderer.invoke('dialog:confirmar-conflicto', d),
   confirmar:          (d) => ipcRenderer.invoke('dialog:confirmar', d),

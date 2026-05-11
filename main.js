@@ -20,9 +20,15 @@ const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const vm = require('vm');
 
 const { buildDefaultConfig } = require('./config.default');
+const {
+  extraerJsonDeConfig,
+  validarFormaConfig,
+  stripAdminClave,
+  reinyectarAdminClave,
+  serializarConfig
+} = require('./lib/config-parser');
 
 // --- Configuración de paths ---
 const SETTINGS_DIR = path.join(app.getPath('userData'));
@@ -47,46 +53,23 @@ let mainWindow = null;
 // ============================================================
 
 /**
- * Lee y parsea config.js usando un sandbox seguro de vm.
- * El archivo es JavaScript, no JSON, por lo que vm.runInNewContext
- * lo interpreta correctamente (con comentarios, etc.) sin acceso
- * al sistema porque el sandbox está aislado.
+ * Lee y parsea config.js sin ejecutarlo como JavaScript.
+ *
+ * Históricamente esto usaba `vm.runInNewContext`, pero la doc de
+ * Node deja claro que `vm` no es una frontera de seguridad: un
+ * config malicioso puede escapar con `this.constructor.constructor(...)`
+ * y obtener RCE. Como el archivo vive en el NAS y el usuario puede
+ * seleccionar cualquier .js desde el diálogo, era una superficie real.
+ *
+ * Ahora extraemos el JSON con un escáner de llaves y `JSON.parse`,
+ * que es estrictamente declarativo.
  */
 function leerConfigDesdeArchivo(rutaArchivo) {
   if (!fs.existsSync(rutaArchivo)) {
     throw new Error(`No existe el archivo: ${rutaArchivo}`);
   }
   const contenido = fs.readFileSync(rutaArchivo, 'utf-8');
-  const sandbox = { window: {} };
-  try {
-    vm.runInNewContext(contenido, sandbox, { timeout: 1000 });
-  } catch (err) {
-    throw new Error(`Error al parsear config.js: ${err.message}`);
-  }
-  if (!sandbox.window.PACKPRICE_CONFIG) {
-    throw new Error('El archivo no contiene window.PACKPRICE_CONFIG');
-  }
-  return sandbox.window.PACKPRICE_CONFIG;
-}
-
-/**
- * Genera el contenido de config.js a partir del objeto de configuración.
- */
-function serializarConfig(config) {
-  const json = JSON.stringify(config, null, 2);
-  return `// ============================================================
-// PackPrice - Configuración de la calculadora
-// ============================================================
-// Editado: ${new Date().toLocaleString('es-ES')}
-// Modificado por: ${config.modificado_por || 'desconocido'}
-//
-// Este archivo es generado por la app. Edítalo solo a mano si
-// estás seguro de lo que haces. La app prefiere ediciones desde
-// el modo administrador.
-// ============================================================
-
-window.PACKPRICE_CONFIG = ${json};
-`;
+  return extraerJsonDeConfig(contenido);
 }
 
 /**
@@ -220,9 +203,9 @@ function guardarSettings(settings) {
 
 function crearVentana() {
   mainWindow = new BrowserWindow({
-    width: 980,
-    height: 800,
-    minWidth: 720,
+    width: 1320,
+    height: 860,
+    minWidth: 820,
     minHeight: 600,
     title: 'PackPrice · Calculadora de packs',
     backgroundColor: '#E8ECF1',
@@ -314,7 +297,7 @@ ipcMain.handle('config:create-default', (event, { ruta, modificadoPor }) => {
       return { ok: false, motivo: r.motivo, error: 'El archivo ya existe en esa ruta' };
     }
     const info = obtenerInfoArchivo(r.ruta);
-    return { ok: true, config: r.config, info, ruta: r.ruta };
+    return { ok: true, config: stripAdminClave(r.config), info, ruta: r.ruta };
   } catch (err) {
     return { ok: false, error: err.message };
   }
@@ -350,7 +333,7 @@ ipcMain.handle('config:read', (event, ruta) => {
   try {
     const config = leerConfigDesdeArchivo(ruta);
     const info = obtenerInfoArchivo(ruta);
-    return { ok: true, config, info };
+    return { ok: true, config: stripAdminClave(config), info };
   } catch (err) {
     return { ok: false, error: err.message };
   }
@@ -369,6 +352,26 @@ ipcMain.handle('config:read', (event, ruta) => {
 //   - { ok: false, conflicto: true, infoActual } si hubo conflicto
 //   - { ok: false, error } si error genérico
 //
+/**
+ * Reinyecta la clave admin en un config recibido del renderer
+ * (que la recibe stripped). Si el archivo en disco no se puede
+ * leer (caso degradado), usamos la clave por defecto en vez de
+ * dejar el config sin admin.clave válido.
+ */
+function fusionarConClaveActual(ruta, configDelRenderer) {
+  let claveActual = null;
+  try {
+    const cfgDisco = leerConfigDesdeArchivo(ruta);
+    claveActual = (cfgDisco.admin && cfgDisco.admin.clave) || null;
+  } catch (_) {
+    // Archivo nuevo o ilegible: fallback a la default. No silenciamos
+    // por costumbre; lo hacemos porque es la única recuperación posible
+    // sin romper la edición admin en curso.
+    claveActual = buildDefaultConfig().admin.clave;
+  }
+  return reinyectarAdminClave(configDelRenderer, claveActual);
+}
+
 ipcMain.handle('config:write', (event, { ruta, configNuevo, infoEsperada }) => {
   try {
     // Detección de conflicto: ¿cambió el archivo desde que el admin lo leyó?
@@ -397,8 +400,9 @@ ipcMain.handle('config:write', (event, { ruta, configNuevo, infoEsperada }) => {
       }
     }
 
-    // Validar que el config nuevo es serializable
-    const contenido = serializarConfig(configNuevo);
+    const configCompleto = fusionarConClaveActual(ruta, configNuevo);
+    validarFormaConfig(configCompleto);
+    const contenido = serializarConfig(configCompleto);
 
     // Backup antes de sobrescribir
     const backupPath = crearBackup(ruta);
@@ -417,11 +421,40 @@ ipcMain.handle('config:write', (event, { ruta, configNuevo, infoEsperada }) => {
 // --- Forzar escritura (sobrescribir conflicto) ---
 ipcMain.handle('config:force-write', (event, { ruta, configNuevo }) => {
   try {
-    const contenido = serializarConfig(configNuevo);
+    const configCompleto = fusionarConClaveActual(ruta, configNuevo);
+    validarFormaConfig(configCompleto);
+    const contenido = serializarConfig(configCompleto);
     crearBackup(ruta);
     fs.writeFileSync(ruta, contenido, 'utf-8');
     const infoNueva = obtenerInfoArchivo(ruta);
     return { ok: true, info: infoNueva };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+});
+
+// --- Verificación de la clave admin (en main, no en renderer) ---
+//
+// El renderer recibe el config sin `admin.clave`, así que la
+// comparación de la clave debe ocurrir aquí. Usamos
+// `crypto.timingSafeEqual` para no filtrar por tiempo. Si las
+// longitudes difieren, devolvemos `false` directamente: el
+// timing sigue ligado a la longitud del candidato, no a su
+// contenido, lo cual es aceptable para un "anti-clic-accidental".
+ipcMain.handle('auth:verify-admin', (event, { ruta, clave }) => {
+  try {
+    if (typeof clave !== 'string' || typeof ruta !== 'string') {
+      return { ok: false, error: 'Parámetros inválidos' };
+    }
+    const cfg = leerConfigDesdeArchivo(ruta);
+    const claveActual = (cfg.admin && cfg.admin.clave) || '';
+    const aBuf = Buffer.from(clave, 'utf-8');
+    const bBuf = Buffer.from(claveActual, 'utf-8');
+    if (aBuf.length !== bBuf.length) {
+      return { ok: true, valida: false };
+    }
+    const valida = crypto.timingSafeEqual(aBuf, bBuf);
+    return { ok: true, valida };
   } catch (err) {
     return { ok: false, error: err.message };
   }
