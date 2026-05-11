@@ -1,6 +1,6 @@
 {
   "name": "packprice",
-  "version": "2.0.0",
+  "version": "2.0.0-preview",
   "description": "PackPrice - calculadora de packs (app de escritorio)",
   "main": "main.js",
   "author": "PackPrice",
@@ -10,11 +10,14 @@
     "dev": "electron .",
     "build:win": "electron-builder --win --x64",
     "build:win-portable": "electron-builder --win portable --x64",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "node -e \"const fs=require('fs');for(const d of ['dist','out','build']){try{fs.rmSync(d,{recursive:true,force:true});}catch(e){}}\""
   },
   "devDependencies": {
     "electron": "^31.0.0",
-    "electron-builder": "^24.13.0"
+    "electron-builder": "^24.13.0",
+    "vitest": "^2.1.0"
   },
   "build": {
     "appId": "com.packprice.calculadora",
@@ -40,7 +43,7 @@
       "icon": "icon.png"
     },
     "portable": {
-      "artifactName": "PackPrice-${version}-portable.exe"
+      "artifactName": "PackPrice-${version}-preliminar.exe"
     }
   }
 }
