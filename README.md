@@ -1,107 +1,110 @@
 # PackPrice
 
-Calculadora de escritorio para presupuestar **packs de personalización textil DTF** (Direct-to-Film). Pensada para uso interno en taller: cada PC corre el `.exe` portable y todos comparten un único `config.js` en el NAS de la empresa.
+> **Language**: English · [Español](README.es.md)
 
-> Estado actual: **beta** (`2.0.0-preview`). En uso interno, pendiente de cerrar PVPs provisionales y de varios pulidos antes de marcar V1.
+Desktop calculator for quoting **DTF (Direct-to-Film) textile customization packs**. Designed for in-house workshop use: every PC runs the portable `.exe` and all of them share a single `config.js` on the company NAS.
 
----
-
-## Qué hace
-
-- Calcula PVP, coste, margen e IVA para cinco modalidades de pack (peña, solo camisetas, solo sudaderas con/sin capucha, mixto de sudaderas).
-- Aplica tramos de volumen (T1–T4) con descuento por cantidad y reducción de tiempo de mano de obra.
-- Soporta recargos directos al cliente por tallas grandes (4XL, 5XL+) y un buffer interno para 3XL.
-- Modo administrador con clave compartida para editar parámetros, PVPs y modelos sin tocar código.
-- Detección de conflictos cuando dos personas editan el `config.js` a la vez (comparación `mtime + sha256`, backup automático antes de cada escritura).
-- Primer arranque guiado: pide nombre del usuario y ruta del config en el NAS, los persiste en `%APPDATA%\packprice\settings.json`, y ofrece sembrar el `config.js` con valores por defecto si no existe.
+> Current status: **beta** (`2.0.0-preview`). In internal use, pending finalization of provisional retail prices and a handful of polish items before tagging V1.
 
 ---
 
-## Stack y filosofía
+## What it does
 
-| Pieza | Decisión |
+- Calculates retail price, cost, margin and VAT for five pack types (peña, t-shirts only, hoodies only with/without hood, mixed hoodies).
+- Applies volume tiers (T1–T4) with quantity-based discounts and labor-time reductions.
+- Supports direct customer surcharges for large sizes (4XL, 5XL+) and an internal buffer for 3XL.
+- Admin mode with shared password to edit parameters, prices and models without touching code.
+- Conflict detection when two people edit `config.js` at the same time (`mtime + sha256` comparison, automatic backup before every write).
+- Guided first-run: prompts the user's name and the path to `config.js` on the NAS, persists them in `%APPDATA%\packprice\settings.json`, and offers to seed `config.js` with default values if it doesn't exist.
+
+---
+
+## Stack and philosophy
+
+| Piece | Decision |
 | --- | --- |
 | Runtime | Electron + Node.js (main) + Chromium (renderer) |
-| UI | HTML + CSS + JS vanilla (sin framework, sin build step) |
-| Persistencia compartida | `config.js` plano en el NAS, parseado en sandbox (`vm.runInNewContext`, timeout 1 s) |
-| Persistencia local | `settings.json` en `%APPDATA%\packprice\` |
-| Tests | Vitest sobre la lógica de cálculo y el parser de config |
-| Empaquetado | `electron-builder` portable Windows x64 |
-| Idioma | Español (dominio, comentarios, UI) |
+| UI | HTML + CSS + vanilla JS (no framework, no build step) |
+| Shared persistence | Plain `config.js` on the NAS, parsed in a sandbox (`vm.runInNewContext`, 1 s timeout) |
+| Local persistence | `settings.json` in `%APPDATA%\packprice\` |
+| Tests | Vitest over the calculation logic and the config parser |
+| Packaging | `electron-builder` portable Windows x64 |
+| Language | Spanish (domain, comments, UI) |
 
-Cero dependencias en runtime. Sólo `electron`, `electron-builder` y `vitest` como `devDependencies`. Las restricciones, principios de diseño e invariantes de seguridad están en [CLAUDE.md](CLAUDE.md).
+Zero runtime dependencies. Only `electron`, `electron-builder` and `vitest` as `devDependencies`. Constraints, design principles and security invariants live in [CLAUDE.md](CLAUDE.md) (Spanish).
 
 ---
 
-## Estructura
+## Layout
 
 ```
 packs app/
-├── PLAN_Calculadora.md     ← plan funcional y fórmulas (fuente de verdad de negocio)
-├── CLAUDE.md               ← guía de trabajo y convenciones
-├── README-build.md         ← cómo construir y distribuir el .exe
-├── README.md               ← este archivo
+├── PLAN_Calculadora.md     ← functional plan and formulas (business source of truth, ES)
+├── CLAUDE.md               ← working guide and conventions (ES)
+├── README-build.md         ← how to build and distribute the .exe (ES)
+├── README.md               ← this file (EN)
+├── README.es.md            ← Spanish version of this file
 ├── LICENSE                 ← Apache 2.0
 ├── package.json
-├── main.js                 ← proceso principal Electron (filesystem + IPC)
-├── preload.js              ← bridge contextual main↔renderer
-├── config.default.js       ← semilla del config.js
+├── main.js                 ← Electron main process (filesystem + IPC)
+├── preload.js              ← contextual bridge main↔renderer
+├── config.default.js       ← seed for config.js
 ├── lib/
-│   └── config-parser.js    ← parser aislado del config en NAS
+│   └── config-parser.js    ← isolated parser for the NAS config
 ├── renderer/
 │   ├── index.html
-│   ├── app.js              ← orquestación (eventos, bootstrap, IPC)
-│   ├── calculo.js          ← lógica pura de cálculo
-│   ├── admin.js            ← editor de modo administrador
-│   ├── format.js           ← helpers de DOM/formato
+│   ├── app.js              ← orchestration (events, bootstrap, IPC)
+│   ├── calculo.js          ← pure calculation logic
+│   ├── admin.js            ← admin-mode editor
+│   ├── format.js           ← DOM/format helpers
 │   └── styles.css
-├── tests/                  ← Vitest sobre cálculo, parser y config por defecto
-└── devlog/                 ← crónica de diseño y decisiones
+├── tests/                  ← Vitest over calculation, parser and default config
+└── devlog/                 ← design and decision log (ES)
 ```
 
 ---
 
-## Uso rápido
+## Quick start
 
 ```bash
-npm install        # solo la primera vez
-npm run dev        # iterar en modo desarrollo
-npm test           # ejecutar tests
-npm run build:win  # construir el .exe portable en dist/
+npm install        # first time only
+npm run dev        # iterate in development mode
+npm test           # run tests
+npm run build:win  # build the portable .exe into dist/
 ```
 
-Detalles de empaquetado, distribución a otros PCs y resolución de problemas: [README-build.md](README-build.md).
+Packaging details, distribution to other PCs and troubleshooting: [README-build.md](README-build.md) (Spanish).
 
 ---
 
 ## Roadmap
 
-Versiones pasadas y previstas. La V4 sólo se aborda si se cruza el umbral cuantitativo descrito; lo demás puede ocurrir antes según necesidad.
+Past and planned versions. V4 is only on the table once the quantitative threshold below is crossed; everything else may happen sooner if needed.
 
-| Versión | Estado | Alcance |
+| Version | Status | Scope |
 | --- | --- | --- |
-| V1 (web) | Cerrada | Prototipo en navegador, sin persistencia compartida |
-| V2 (Electron) | **Beta actual** | App de escritorio, `config.js` en NAS, modo admin, conflictos, backups |
-| V2.x | En curso | Cierre de PVPs provisionales (sudaderas), pulido UI, más tests |
-| V3 | Planificado | Historial de presupuestos por PC (`localStorage`), exportación a PDF |
-| V4 | Condicional | Backend HTTP local (Node + Express + SQLite) si se superan ~5 usuarios o se piden reportes cross-PC. Auto-update con `electron-updater` |
+| V1 (web) | Closed | Browser prototype, no shared persistence |
+| V2 (Electron) | **Current beta** | Desktop app, `config.js` on NAS, admin mode, conflict handling, backups |
+| V2.x | In progress | Finalize provisional prices (hoodies), UI polish, more tests |
+| V3 | Planned | Per-PC quote history (`localStorage`), PDF export |
+| V4 | Conditional | Local HTTP backend (Node + Express + SQLite) if more than ~5 users or cross-PC reporting is needed. Auto-update via `electron-updater` |
 
-Decisiones contempladas pero **deliberadamente fuera de alcance hoy**: TypeScript, frameworks UI (React/Vue/Svelte), bundlers, telemetría, internacionalización. Justificación y criterios para reconsiderar: [CLAUDE.md §11](CLAUDE.md).
-
----
-
-## Contribuir
-
-Proyecto interno de empresa pequeña (2–3 usuarios). No se aceptan PRs de terceros por defecto. Si vas a tocar el código:
-
-1. Lee [CLAUDE.md](CLAUDE.md) (convenciones, principios, qué NO hacer).
-2. Lee [PLAN_Calculadora.md](PLAN_Calculadora.md) si vas a tocar lógica de negocio.
-3. Ejecuta `npm test` antes de proponer cambios.
-4. Mantén las funciones de cálculo puras y testables.
+Decisions deliberately **out of scope today**: TypeScript, UI frameworks (React/Vue/Svelte), bundlers, telemetry, internationalization. Rationale and criteria for revisiting them: [CLAUDE.md §11](CLAUDE.md).
 
 ---
 
-## Licencia
+## Contributing
+
+Internal project of a small business (2–3 users). Third-party PRs are not accepted by default. If you do touch the code:
+
+1. Read [CLAUDE.md](CLAUDE.md) (conventions, principles, what NOT to do).
+2. Read [PLAN_Calculadora.md](PLAN_Calculadora.md) if you're going to change business logic.
+3. Run `npm test` before proposing changes.
+4. Keep calculation functions pure and testable.
+
+---
+
+## License
 
 [Apache License 2.0](LICENSE) — © 2026 Alejandro Escarpa Prieto.
 
@@ -109,13 +112,13 @@ Proyecto interno de empresa pequeña (2–3 usuarios). No se aceptan PRs de terc
 
 ## About
 
-**PackPrice** nace en un taller de personalización textil DTF en Guadalajara (España) con más de 25 años en el sector. La meta es muy concreta: presupuestar en segundos los "packs de peña" típicos de verano, manteniendo márgenes sanos y comunicando precios consistentes con descuento por volumen, sin depender de hojas de cálculo dispersas ni de la memoria del que coge el teléfono.
+**PackPrice** was born in a DTF textile customization workshop in Guadalajara (Spain) with more than 25 years in the trade. The goal is very specific: quote the typical summer "packs de peña" (group merchandise orders) in seconds, keeping margins healthy and communicating consistent prices with volume discounts, without depending on scattered spreadsheets or whoever happens to pick up the phone.
 
-El diseño prioriza **claridad sobre flexibilidad**, **datos fuera del código** y **mínimo mantenimiento**: si un PVP cambia, el cambio es de datos, no de despliegue. La app debe seguir siendo entendible y editable por una sola persona dentro de cinco años.
+The design prioritizes **clarity over flexibility**, **data outside the code** and **minimum maintenance**: if a price changes, the change is data, not a deployment. The app must remain understandable and editable by a single person five years from now.
 
-- **Autor**: Alejandro Escarpa Prieto
-- **Contexto**: empresa familiar, uso interno, sin telemetría ni servicios en la nube
-- **Principios**: YAGNI, fail-fast, español en el dominio, cero build step
+- **Author**: Alejandro Escarpa Prieto
+- **Context**: family business, internal use, no telemetry, no cloud services
+- **Principles**: YAGNI, fail-fast, Spanish in the domain, no build step
 
 ---
 
